@@ -139,10 +139,6 @@ public inherited sharing class MockRepository extends Repository {
     return new MockRepositoryService(this);
   }
 
-  public override RepositoryService withoutSharingAsUser() {
-    return new MockRepositoryService(this);
-  }
-
   public class DeleteResultBuilder {
     private Boolean success;
     private String id;
