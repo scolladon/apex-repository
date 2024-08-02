@@ -1,8 +1,16 @@
 {
   "packageDirectories": [
     {
-      "path": "apex-repository",
+      "path": "apex-repository/src",
       "default": true
+    },
+    {
+      "path": "apex-repository/test/unit",
+      "default": false
+    },
+    {
+      "path": "apex-repository/test/functional",
+      "default": false
     }
   ],
   "name": "poc",

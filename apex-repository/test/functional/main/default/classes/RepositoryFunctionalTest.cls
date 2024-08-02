@@ -1,0 +1,3 @@
+@isTest
+private class RepositoryFunctionalTest {
+}
