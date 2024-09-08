@@ -13,6 +13,12 @@ public class FunctionalDataFactory {
     return this.getUser('min-access@test.io', FunctionalDataFactory.MINIMUM_ACCESS_PROFILE_ID);
   }
 
+  public User getMinimalAccessUserWithObjectPermissions() {
+    final User aUser = this.getUser('min-access@test.io', FunctionalDataFactory.MINIMUM_ACCESS_PROFILE_ID);
+    this.addObjectPermission(aUser);
+    return aUser;
+  }
+
   private User getUser(final String userName, final Id profileId) {
     final User[] users = [SELECT Id FROM User WHERE UserName = :userName LIMIT 1];
     if (users.size() == 1) {
@@ -25,11 +31,12 @@ public class FunctionalDataFactory {
     aUser.UserName = userName;
     aUser.ProfileId = profileId;
     insert aUser;
+    return aUser;
+  }
 
+  private void addObjectPermission(final User aUser) {
     PermissionSetAssignment assignment = new PermissionSetAssignment(AssigneeId = aUser.Id, PermissionSetId = TESTSUBJECT_PSET_ID);
     insert assignment;
-
-    return aUser;
   }
 
   public RepositoryTestSubject__c buildTestSubject() {
