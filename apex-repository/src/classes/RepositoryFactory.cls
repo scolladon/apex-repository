@@ -1,4 +1,4 @@
-public inherited sharing virtual class Repository {
+public inherited sharing virtual class RepositoryFactory {
   private static RepositoryService repositoryWithSharingAsSystem;
   private static RepositoryService repositoryWithoutSharingAsSystem;
   private static RepositoryService repositoryWithSharingAsUser;
@@ -9,21 +9,21 @@ public inherited sharing virtual class Repository {
    * In user mode, the current user's object permissions, field-level security, and sharing rules are enforced.
    */
 
-  public virtual RepositoryService withSharingAsSystem() {
+  public virtual RepositoryService asSystemWithSharing() {
     if (repositoryWithSharingAsSystem == null) {
       repositoryWithSharingAsSystem = new RepositoryWithSharingAsSystem();
     }
     return repositoryWithSharingAsSystem;
   }
 
-  public virtual RepositoryService withoutSharingAsSystem() {
+  public virtual RepositoryService asSystemWithoutSharing() {
     if (repositoryWithoutSharingAsSystem == null) {
       repositoryWithoutSharingAsSystem = new RepositoryWithoutSharingAsSystem();
     }
     return repositoryWithoutSharingAsSystem;
   }
 
-  public virtual RepositoryService withSharingAsUser() {
+  public virtual RepositoryService asUser() {
     if (repositoryWithSharingAsUser == null) {
       repositoryWithSharingAsUser = new RepositoryWithSharingAsUser();
     }
@@ -46,15 +46,6 @@ public inherited sharing virtual class Repository {
     public RepositoryWithSharingAsUser() {
       super(AccessLevel.USER_MODE);
     }
-  }
-
-  public interface RepositoryService {
-    List<Database.SaveResult> insertRecords(List<SObject> records, Database.DmlOptions options);
-    List<Database.SaveResult> updateRecords(List<SObject> records, Database.DmlOptions options);
-    List<Database.UpsertResult> upsertRecords(List<SObject> records, Schema.SObjectField externalIDField, Boolean allOrNone);
-    List<Database.DeleteResult> deleteRecords(List<SObject> records, Boolean allOrNone);
-    List<SObject> query(String soql, Map<String, Object> bindMap);
-    List<List<SObject>> find(String sosl);
   }
 
   private inherited sharing abstract class BaseRepository implements RepositoryService {

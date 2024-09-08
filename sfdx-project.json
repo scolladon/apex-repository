@@ -11,10 +11,14 @@
     {
       "path": "apex-repository/test/functional",
       "default": false
+    },
+    {
+      "path": "apex-repository/recipes",
+      "default": false
     }
   ],
   "name": "poc",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "59.0"
+  "sourceApiVersion": "61.0"
 }

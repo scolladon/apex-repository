@@ -1,5 +1,5 @@
 @isTest
-public inherited sharing class MockRepository extends Repository {
+public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
   private static List<SObject> mockDatabase = new List<SObject>();
 
   // Listes pour stocker les appels de fonction et leurs paramètres
@@ -14,10 +14,10 @@ public inherited sharing class MockRepository extends Repository {
   public Map<String, Database.SaveResult> saveResultOverrides = new Map<String, Database.SaveResult>();
   public Map<String, Database.DeleteResult> deleteResultOverrides = new Map<String, Database.DeleteResult>();
 
-  private class MockRepositoryService implements Repository.RepositoryService {
-    private MockRepository parent;
+  private class MockRepositoryService implements RepositoryService {
+    private MockRepositoryFactory parent;
 
-    public MockRepositoryService(MockRepository parent) {
+    public MockRepositoryService(MockRepositoryFactory parent) {
       this.parent = parent;
     }
 
@@ -127,15 +127,15 @@ public inherited sharing class MockRepository extends Repository {
     }
   }
 
-  public override RepositoryService withSharingAsSystem() {
+  public override RepositoryService asSystemWithSharing() {
     return new MockRepositoryService(this);
   }
 
-  public override RepositoryService withoutSharingAsSystem() {
+  public override RepositoryService asSystemWithoutSharing() {
     return new MockRepositoryService(this);
   }
 
-  public override RepositoryService withSharingAsUser() {
+  public override RepositoryService asUser() {
     return new MockRepositoryService(this);
   }
 

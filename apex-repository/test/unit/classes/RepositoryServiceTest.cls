@@ -1,10 +1,10 @@
 @IsTest
-private class RepositoryTest {
+private class RepositoryServiceTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenInsertRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     Account acc2 = new Account(Name = 'Test Account 2');
@@ -12,7 +12,7 @@ private class RepositoryTest {
     Database.DmlOptions options = new Database.DmlOptions();
 
     // Act
-    List<Database.SaveResult> results = service.insertRecords(records, options);
+    List<Database.SaveResult> results = sut.insertRecords(records, options);
 
     // Assert
     Assert.areEqual(2, results.size(), 'Expected two SaveResult records');
@@ -25,8 +25,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenInsertRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     Account acc2 = new Account(Name = 'Test Account 2');
@@ -34,7 +34,7 @@ private class RepositoryTest {
     Database.DmlOptions options = new Database.DmlOptions();
 
     // Act
-    List<Database.SaveResult> results = service.insertRecords(records, options);
+    List<Database.SaveResult> results = sut.insertRecords(records, options);
 
     // Assert
     Assert.areEqual(2, results.size(), 'Expected two SaveResult records');
@@ -47,8 +47,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenInsertRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     Account acc2 = new Account(Name = 'Test Account 2');
@@ -56,7 +56,7 @@ private class RepositoryTest {
     Database.DmlOptions options = new Database.DmlOptions();
 
     // Act
-    List<Database.SaveResult> results = service.insertRecords(records, options);
+    List<Database.SaveResult> results = sut.insertRecords(records, options);
 
     // Assert
     Assert.areEqual(2, results.size(), 'Expected two SaveResult records');
@@ -69,17 +69,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenUpdateRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.SaveResult> results = service.updateRecords(records, options);
+    List<Database.SaveResult> results = sut.updateRecords(records, options);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one SaveResult records');
@@ -92,17 +92,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenUpdateRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.SaveResult> results = service.updateRecords(records, options);
+    List<Database.SaveResult> results = sut.updateRecords(records, options);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one SaveResult records');
@@ -115,17 +115,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenUpdateRecords_thenSaveResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.SaveResult> results = service.updateRecords(records, options);
+    List<Database.SaveResult> results = sut.updateRecords(records, options);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one SaveResult records');
@@ -138,17 +138,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenUpsertRecords_thenUpsertResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.UpsertResult> results = service.upsertRecords(records, Account.Id, false);
+    List<Database.UpsertResult> results = sut.upsertRecords(records, Account.Id, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one UpsertResult records');
@@ -161,17 +161,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenUpsertRecords_thenUpsertResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.UpsertResult> results = service.upsertRecords(records, Account.Id, false);
+    List<Database.UpsertResult> results = sut.upsertRecords(records, Account.Id, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one UpsertResult records');
@@ -184,17 +184,17 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenUpsertRecords_thenUpsertResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
     acc1.Name = 'Another Name';
 
     // Act
-    List<Database.UpsertResult> results = service.upsertRecords(records, Account.Id, false);
+    List<Database.UpsertResult> results = sut.upsertRecords(records, Account.Id, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one UpsertResult records');
@@ -207,16 +207,16 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenDeleteRecords_thenDeleteResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
 
     // Act
-    List<Database.DeleteResult> results = service.deleteRecords(records, false);
+    List<Database.DeleteResult> results = sut.deleteRecords(records, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
@@ -229,16 +229,16 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenDeleteRecords_thenDeleteResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
 
     // Act
-    List<Database.DeleteResult> results = service.deleteRecords(records, false);
+    List<Database.DeleteResult> results = sut.deleteRecords(records, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
@@ -251,16 +251,16 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenDeleteRecords_thenDeleteResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc1 = new Account(Name = 'Test Account 1');
     List<SObject> records = new List<SObject>{ acc1 };
     Database.DmlOptions options = new Database.DmlOptions();
-    service.insertRecords(records, options);
+    sut.insertRecords(records, options);
 
     // Act
-    List<Database.DeleteResult> results = service.deleteRecords(records, false);
+    List<Database.DeleteResult> results = sut.deleteRecords(records, false);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
@@ -273,8 +273,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenQuery_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -283,7 +283,7 @@ private class RepositoryTest {
     Map<String, Object> bindMap = new Map<String, Object>{ 'Name' => acc.Name };
 
     // Act
-    List<SObject> results = service.query(soql, bindMap);
+    List<SObject> results = sut.query(soql, bindMap);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
@@ -294,8 +294,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenQuery_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -304,7 +304,7 @@ private class RepositoryTest {
     Map<String, Object> bindMap = new Map<String, Object>{ 'Name' => acc.Name };
 
     // Act
-    List<SObject> results = service.query(soql, bindMap);
+    List<SObject> results = sut.query(soql, bindMap);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
@@ -315,8 +315,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenQuery_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -325,7 +325,7 @@ private class RepositoryTest {
     Map<String, Object> bindMap = new Map<String, Object>{ 'Name' => acc.Name };
 
     // Act
-    List<SObject> results = service.query(soql, bindMap);
+    List<SObject> results = sut.query(soql, bindMap);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
@@ -336,8 +336,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsSystem_whenFind_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -346,7 +346,7 @@ private class RepositoryTest {
     Test.setFixedSearchResults(new List<Id>{ acc.Id });
 
     // Act
-    List<List<SObject>> results = service.find(sosl);
+    List<List<SObject>> results = sut.find(sosl);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
@@ -357,8 +357,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithoutSharingAsSystem_whenFind_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withoutSharingAsSystem();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -367,8 +367,7 @@ private class RepositoryTest {
     Test.setFixedSearchResults(new List<Id>{ acc.Id });
 
     // Act
-    List<List<SObject>> results = service.find(sosl);
-    System.debug(results);
+    List<List<SObject>> results = sut.find(sosl);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
@@ -379,8 +378,8 @@ private class RepositoryTest {
   @IsTest
   static void givenRepositoryWithSharingAsUser_whenFind_thenReturnResults() {
     // Arrange
-    Repository repo = new Repository();
-    Repository.RepositoryService service = repo.withSharingAsUser();
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
 
     Account acc = new Account(Name = 'Test Account');
     insert acc;
@@ -389,7 +388,7 @@ private class RepositoryTest {
     Test.setFixedSearchResults(new List<Id>{ acc.Id });
 
     // Act
-    List<List<SObject>> results = service.find(sosl);
+    List<List<SObject>> results = sut.find(sosl);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
