@@ -1,5 +1,5 @@
 @isTest
-public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
+public inherited sharing class InMemoryRepositoryFactory extends RepositoryFactory {
   private static List<SObject> mockDatabase = new List<SObject>();
 
   // Listes pour stocker les appels de fonction et leurs paramètres
@@ -10,38 +10,42 @@ public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
   public List<Map<String, Object>> queryCallParameters = new List<Map<String, Object>>();
   public List<String> findCallParameters = new List<String>();
 
-  // Configurations de réponses spécifiques
-  public Map<String, Database.SaveResult> saveResultOverrides = new Map<String, Database.SaveResult>();
-  public Map<String, Database.DeleteResult> deleteResultOverrides = new Map<String, Database.DeleteResult>();
+  public override RepositoryService asSystemWithSharing() {
+    return new MockRepositoryService(this);
+  }
+
+  public override RepositoryService asSystemWithoutSharing() {
+    return new MockRepositoryService(this);
+  }
+
+  public override RepositoryService asUser() {
+    return new MockRepositoryService(this);
+  }
 
   private class MockRepositoryService implements RepositoryService {
-    private MockRepositoryFactory parent;
+    private InMemoryRepositoryFactory parent;
 
-    public MockRepositoryService(MockRepositoryFactory parent) {
+    public MockRepositoryService(InMemoryRepositoryFactory parent) {
       this.parent = parent;
     }
 
     public List<Database.SaveResult> insertRecords(List<SObject> records, Database.DmlOptions options) {
-      parent.insertCallParameters.add(records);
+      this.parent.insertCallParameters.add(records.deepClone());
 
       List<Database.SaveResult> results = new List<Database.SaveResult>();
       for (SObject record : records) {
-        if (parent.saveResultOverrides.containsKey(record.Id)) {
-          results.add(parent.saveResultOverrides.get(record.Id));
-        } else {
-          record.Id = getFakeId(record.getSObjectType());
-          mockDatabase.add(record);
+        record.Id = getFakeId(record.getSObjectType());
+        mockDatabase.add(record);
 
-          SaveResultBuilder builder = new SaveResultBuilder().withSuccess(true).withId(record.Id);
+        SaveResultBuilder builder = new SaveResultBuilder().withSuccess(true).withId(record.Id);
 
-          results.add(builder.build());
-        }
+        results.add(builder.build());
       }
       return results;
     }
 
     public List<Database.SaveResult> updateRecords(List<SObject> records, Database.DmlOptions options) {
-      parent.updateCallParameters.add(records);
+      this.parent.updateCallParameters.add(records);
 
       List<Database.SaveResult> results = new List<Database.SaveResult>();
       for (SObject record : records) {
@@ -62,7 +66,7 @@ public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
     }
 
     public List<Database.UpsertResult> upsertRecords(List<SObject> records, Schema.SObjectField externalIDField, Boolean allOrNone) {
-      parent.upsertCallParameters.add(records);
+      this.parent.upsertCallParameters.add(records);
 
       List<Database.UpsertResult> results = new List<Database.UpsertResult>();
       for (SObject record : records) {
@@ -87,26 +91,22 @@ public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
     }
 
     public List<Database.DeleteResult> deleteRecords(List<SObject> records, Boolean allOrNone) {
-      parent.deleteCallParameters.add(records);
+      this.parent.deleteCallParameters.add(records);
 
       List<Database.DeleteResult> results = new List<Database.DeleteResult>();
       for (SObject record : records) {
-        if (parent.deleteResultOverrides.containsKey(record.Id)) {
-          results.add(parent.deleteResultOverrides.get(record.Id));
-        } else {
-          Boolean deleted = false;
-          for (Integer i = 0; i < mockDatabase.size(); i++) {
-            if (mockDatabase[i].Id == record.Id) {
-              mockDatabase.remove(i);
-              deleted = true;
-              break;
-            }
+        Boolean deleted = false;
+        for (Integer i = 0; i < mockDatabase.size(); i++) {
+          if (mockDatabase[i].Id == record.Id) {
+            mockDatabase.remove(i);
+            deleted = true;
+            break;
           }
-
-          DeleteResultBuilder builder = new DeleteResultBuilder().withSuccess(deleted).withId(record.Id);
-
-          results.add(builder.build());
         }
+
+        DeleteResultBuilder builder = new DeleteResultBuilder().withSuccess(deleted).withId(record.Id);
+
+        results.add(builder.build());
       }
       return results;
     }
@@ -115,28 +115,16 @@ public inherited sharing class MockRepositoryFactory extends RepositoryFactory {
       Map<String, Object> callParams = new Map<String, Object>();
       callParams.put('soql', soql);
       callParams.put('bindMap', bindMap);
-      parent.queryCallParameters.add(callParams);
+      this.parent.queryCallParameters.add(callParams);
 
       return new List<SObject>(mockDatabase);
     }
 
     public List<List<SObject>> find(String sosl) {
-      parent.findCallParameters.add(sosl);
+      this.parent.findCallParameters.add(sosl);
 
       return new List<List<SObject>>{ new List<SObject>(mockDatabase) };
     }
-  }
-
-  public override RepositoryService asSystemWithSharing() {
-    return new MockRepositoryService(this);
-  }
-
-  public override RepositoryService asSystemWithoutSharing() {
-    return new MockRepositoryService(this);
-  }
-
-  public override RepositoryService asUser() {
-    return new MockRepositoryService(this);
   }
 
   public class DeleteResultBuilder {
