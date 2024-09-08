@@ -2,12 +2,12 @@ public with sharing class AccountService {
   RepositoryService repository;
 
   public AccountService() {
-    this(new RepositoryFactory());
+    this(new RepositoryFactory().asUser());
   }
 
   @testVisible
-  private AccountService(final RepositoryFactory repoFactory) {
-    this.repository = repoFactory.asUser();
+  private AccountService(final RepositoryService repository) {
+    this.repository = repository;
   }
 
   public Account createAccount() {
