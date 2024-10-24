@@ -131,6 +131,7 @@ public class InMemoryRepositoryService implements RepositoryService {
     return new List<SObject>();
   }
 
+  Pattern SOSL_SOBJECT_PATTERN = Pattern.compile('FROM\\s*(\\w+)\\s');
   public List<List<SObject>> find(String sosl) {
     this.findCallParameters.add(sosl);
 
