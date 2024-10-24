@@ -21,7 +21,7 @@ private class AccountServiceTest {
     final InMemoryRepositoryService repository = new InMemoryRepositoryService();
     final AccountService sut = new AccountService(repository);
     final Account account = new Account(Name = 'Test', Id = InMemoryRepositoryService.getFakeId(Account.getSObjectType()));
-    repository.mockDatabase.add(account);
+    repository.mockDatabase.put(Account.getSObjectType(), new List<SObject>{ account });
 
     // Act
     sut.updateAccount(account);
@@ -37,7 +37,7 @@ private class AccountServiceTest {
     final InMemoryRepositoryService repository = new InMemoryRepositoryService();
     final AccountService sut = new AccountService(repository);
     final Account account = new Account(Name = 'Test', Id = InMemoryRepositoryService.getFakeId(Account.getSObjectType()));
-    repository.mockDatabase.add(account);
+    repository.mockDatabase.put(Account.getSObjectType(), new List<SObject>{ account });
 
     // Act
     sut.deleteAccount(account);
@@ -51,7 +51,7 @@ private class AccountServiceTest {
     // Arrange
     final InMemoryRepositoryService repository = new InMemoryRepositoryService();
     final AccountService sut = new AccountService(repository);
-    repository.mockDatabase.add(new Account(Name = 'Test', Id = InMemoryRepositoryService.getFakeId(Account.getSObjectType())));
+    repository.mockDatabase.put(Account.getSObjectType(), new List<SObject>{ new Account(Name = 'Test', Id = InMemoryRepositoryService.getFakeId(Account.getSObjectType())) });
 
     // Act
     final Account result = sut.getExistingAccount('Test')[0];

@@ -1,6 +1,6 @@
 @isTest
 public class InMemoryRepositoryService implements RepositoryService {
-  public List<SObject> mockDatabase { get; private set; }
+  public Map<SObjectType, List<SObject>> mockDatabase { get; private set; }
   public List<List<SObject>> insertCallParameters { get; private set; }
   public List<List<SObject>> updateCallParameters { get; private set; }
   public List<List<SObject>> upsertCallParameters { get; private set; }
@@ -9,7 +9,7 @@ public class InMemoryRepositoryService implements RepositoryService {
   public List<String> findCallParameters { get; private set; }
 
   public InMemoryRepositoryService() {
-    this.mockDatabase = new List<SObject>();
+    this.mockDatabase = new Map<SObjectType, List<SObject>>();
     this.insertCallParameters = new List<List<SObject>>();
     this.updateCallParameters = new List<List<SObject>>();
     this.upsertCallParameters = new List<List<SObject>>();
@@ -24,8 +24,13 @@ public class InMemoryRepositoryService implements RepositoryService {
 
     List<Database.SaveResult> results = new List<Database.SaveResult>();
     for (SObject record : records) {
-      record.Id = getFakeId(record.getSObjectType());
-      this.mockDatabase.add(record);
+      SObjectType objectType = record.getSObjectType();
+      record.Id = getFakeId(objectType);
+
+      if (!this.mockDatabase.containsKey(objectType)) {
+        this.mockDatabase.put(objectType, new List<SObject>());
+      }
+      this.mockDatabase.get(objectType).add(record);
 
       SaveResultBuilder builder = new SaveResultBuilder().withSuccess(true).withId(record.Id);
 
@@ -39,10 +44,12 @@ public class InMemoryRepositoryService implements RepositoryService {
 
     List<Database.SaveResult> results = new List<Database.SaveResult>();
     for (SObject record : records) {
+      SObjectType objectType = record.getSObjectType();
       Boolean updated = false;
-      for (Integer i = 0; i < this.mockDatabase.size(); i++) {
-        if (this.mockDatabase[i].Id == record.Id) {
-          this.mockDatabase[i] = record;
+      List<SObject> sobjectsForTheType = this.mockDatabase.get(objectType);
+      for (Integer i = 0; i < sobjectsForTheType.size(); i++) {
+        if (sobjectsForTheType[i].Id == record.Id) {
+          sobjectsForTheType[i] = record;
           updated = true;
           break;
         }
@@ -60,17 +67,22 @@ public class InMemoryRepositoryService implements RepositoryService {
 
     List<Database.UpsertResult> results = new List<Database.UpsertResult>();
     for (SObject record : records) {
-      Boolean created = true;
-      for (Integer i = 0; i < mockDatabase.size(); i++) {
-        if (this.mockDatabase[i].Id == record.Id) {
-          this.mockDatabase[i] = record;
-          created = false;
+      SObjectType objectType = record.getSObjectType();
+      Boolean created = false;
+      List<SObject> sobjectsForTheType = this.mockDatabase.get(objectType);
+      for (Integer i = 0; i < sobjectsForTheType.size(); i++) {
+        if (sobjectsForTheType[i].Id == record.Id) {
+          sobjectsForTheType[i] = record;
+          created = true;
           break;
         }
       }
       if (created) {
-        record.Id = getFakeId(record.getSObjectType());
-        this.mockDatabase.add(record);
+        record.Id = getFakeId(objectType);
+        if (!this.mockDatabase.containsKey(objectType)) {
+          this.mockDatabase.put(objectType, new List<SObject>());
+        }
+        this.mockDatabase.get(objectType).add(record);
       }
 
       UpsertResultBuilder builder = new UpsertResultBuilder().withSuccess(true).withCreated(created).withId(record.Id);
@@ -85,10 +97,12 @@ public class InMemoryRepositoryService implements RepositoryService {
 
     List<Database.DeleteResult> results = new List<Database.DeleteResult>();
     for (SObject record : records) {
+      SObjectType objectType = record.getSObjectType();
       Boolean deleted = false;
-      for (Integer i = 0; i < this.mockDatabase.size(); i++) {
-        if (this.mockDatabase[i].Id == record.Id) {
-          this.mockDatabase.remove(i);
+      List<SObject> sobjectsForTheType = this.mockDatabase.get(objectType);
+      for (Integer i = 0; i < sobjectsForTheType.size(); i++) {
+        if (sobjectsForTheType[i].Id == record.Id) {
+          sobjectsForTheType.remove(i);
           deleted = true;
           break;
         }
@@ -101,19 +115,33 @@ public class InMemoryRepositoryService implements RepositoryService {
     return results;
   }
 
+  Pattern SOQL_SOBJECT_PATTERN = Pattern.compile('FROM\\s*(\\w+)\\s');
   public List<SObject> query(String soql, Map<String, Object> bindMap) {
     Map<String, Object> callParams = new Map<String, Object>();
     callParams.put('soql', soql);
     callParams.put('bindMap', bindMap);
     this.queryCallParameters.add(callParams);
 
-    return new List<SObject>(this.mockDatabase);
+    Matcher sobjectMatcher = SOQL_SOBJECT_PATTERN.matcher(soql);
+    if (sobjectMatcher.find()) {
+      SObjectType objectType = ((SObject) Type.forName(sobjectMatcher.group(1)).newInstance()).getSObjectType();
+      return this.mockDatabase.get(objectType);
+    }
+
+    return new List<SObject>();
   }
 
   public List<List<SObject>> find(String sosl) {
     this.findCallParameters.add(sosl);
 
-    return new List<List<SObject>>{ new List<SObject>(this.mockDatabase) };
+    List<String> sobjects = sosl.split('RETURNING ')[1].replaceAll('\\(.*\\)', '').replace(' ', '').split(',');
+    List<List<SObject>> result = new List<List<SObject>>();
+    for (String sobjectType : sobjects) {
+      SObjectType objectType = ((SObject) Type.forName(sobjectType).newInstance()).getSObjectType();
+      result.add(this.mockDatabase.get(objectType));
+    }
+
+    return result;
   }
 
   public class DeleteResultBuilder {
