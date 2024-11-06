@@ -144,4 +144,18 @@ public class InMemoryRepositoryService implements RepositoryService {
 
     return result;
   }
+
+  public List<SObject> query(final List<SObject> soql) {
+    SObjectType objectType = soql.getSObjectType();
+    return this.mockDatabase.get(objectType);
+  }
+
+  public List<List<SObject>> find(final List<List<SObject>> sosl) {
+    List<List<SObject>> result = new List<List<SObject>>();
+    for (List<SObject> subResult : sosl) {
+      SObjectType objectType = subResult.getSObjectType();
+      result.add(this.mockDatabase.get(objectType));
+    }
+    return result;
+  }
 }
