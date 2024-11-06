@@ -81,8 +81,16 @@ public inherited sharing virtual class RepositoryFactory {
       return Database.queryWithBinds(soql, bindMap, this.mode);
     }
 
+    public virtual List<SObject> query(final List<SObject> soql) {
+      return soql;
+    }
+
     public virtual List<List<SObject>> find(final String sosl) {
       return Search.query(sosl, this.mode);
+    }
+
+    public virtual List<List<SObject>> find(final List<List<SObject>> sosl) {
+      return sosl;
     }
   }
 }

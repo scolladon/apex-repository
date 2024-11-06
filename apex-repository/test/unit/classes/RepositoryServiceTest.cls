@@ -271,7 +271,7 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithSharingAsSystem_whenQuery_thenReturnResults() {
+  static void givenRepositoryWithSharingAsSystem_whenQueryString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asSystemWithSharing();
@@ -292,7 +292,7 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithoutSharingAsSystem_whenQuery_thenReturnResults() {
+  static void givenRepositoryWithoutSharingAsSystem_whenQueryString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asSystemWithoutSharing();
@@ -313,7 +313,7 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithSharingAsUser_whenQuery_thenReturnResults() {
+  static void givenRepositoryWithSharingAsUser_whenQueryString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asUser();
@@ -334,7 +334,61 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithSharingAsSystem_whenFind_thenReturnResults() {
+  static void givenRepositoryWithSharingAsSystem_whenQuery_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    // Act
+    List<SObject> results = sut.query([SELECT Id, Name FROM Account WHERE Name = :acc.Name]);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithoutSharingAsSystem_whenQuery_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    // Act
+    List<SObject> results = sut.query([SELECT Id, Name FROM Account WHERE Name = :acc.Name]);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithSharingAsUser_whenQuery_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    // Act
+    List<SObject> results = sut.query([SELECT Id, Name FROM Account WHERE Name = :acc.Name]);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithSharingAsSystem_whenFindString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asSystemWithSharing();
@@ -355,7 +409,7 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithoutSharingAsSystem_whenFind_thenReturnResults() {
+  static void givenRepositoryWithoutSharingAsSystem_whenFindString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asSystemWithoutSharing();
@@ -376,7 +430,7 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
-  static void givenRepositoryWithSharingAsUser_whenFind_thenReturnResults() {
+  static void givenRepositoryWithSharingAsUser_whenFindString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
     RepositoryService sut = repoFactory.asUser();
@@ -389,6 +443,66 @@ private class RepositoryServiceTest {
 
     // Act
     List<List<SObject>> results = sut.find(sosl);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0][0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithSharingAsSystem_whenFind_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    Test.setFixedSearchResults(new List<Id>{ acc.Id });
+
+    // Act
+    List<List<SObject>> results = sut.find([FIND 'Test Account' IN NAME FIELDS RETURNING Account(Id, Name)]);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0][0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithoutSharingAsSystem_whenFind_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    Test.setFixedSearchResults(new List<Id>{ acc.Id });
+
+    // Act
+    List<List<SObject>> results = sut.find([FIND 'Test Account' IN NAME FIELDS RETURNING Account(Id, Name)]);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one record from the query');
+    Account resultAcc = (Account) results[0][0];
+    Assert.areEqual(acc.Name, resultAcc.Name, 'Expected queried record to match');
+  }
+
+  @IsTest
+  static void givenRepositoryWithSharingAsUser_whenFind_thenReturnResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
+
+    Account acc = new Account(Name = 'Test Account');
+    insert acc;
+
+    Test.setFixedSearchResults(new List<Id>{ acc.Id });
+
+    // Act
+    List<List<SObject>> results = sut.find([FIND 'Test Account' IN NAME FIELDS RETURNING Account(Id, Name)]);
 
     // Assert
     Assert.areEqual(1, results.size(), 'Expected one record from the query');
