@@ -1,5 +1,5 @@
-public inherited sharing class DAL {
-  @testVisible
+public inherited sharing class DAL { // RepositoryService ACL
+  @testVisible // Usefull only for DAL_TEST but should not be used in other tests
   private static RepositoryService repoService;
   private static Boolean mocking = false;
 
@@ -31,11 +31,52 @@ public inherited sharing class DAL {
   }
 
   @testVisible
-  private static Mock mock() {
-    final Mock repoServiceMock = Mock.forType(RepositoryService.class);
-    DAL.setDatabaseAccessMode((RepositoryService) repoServiceMock.stub);
+  private static DAL.UnitTestDouble mock() {
+    final DAL.UnitTestDouble dalMock = new DAL.UnitTestDouble();
+    DAL.repoService = dalMock.getStub();
     DAL.mocking = true;
-    return repoServiceMock;
+    return dalMock;
+  }
+
+  @testVisible
+  private class UnitTestDouble { // Mocking library ACL
+    private final Mock repoServiceMock;
+
+    public UnitTestDouble() {
+      this.repoServiceMock = Mock.forType(RepositoryService.class);
+    }
+
+    private RepositoryService getStub() {
+      return (RepositoryService) this.repoServiceMock.stub;
+    }
+
+    public MethodSpy spyOnInsert() {
+      return this.spyOn('insertRecords');
+    }
+
+    public MethodSpy spyOnUpdate() {
+      return this.spyOn('updateRecords');
+    }
+
+    public MethodSpy spyOnUpsert() {
+      return this.spyOn('upsertRecords');
+    }
+
+    public MethodSpy spyOnDelete() {
+      return this.spyOn('deleteRecords');
+    }
+
+    public MethodSpy spyOnQuery() {
+      return this.spyOn('query');
+    }
+
+    public MethodSpy spyOnFind() {
+      return this.spyOn('find');
+    }
+
+    private MethodSpy spyOn(final String methodName) {
+      return this.repoServiceMock.spyOn(methodName);
+    }
   }
 
   // For integrated test or post/pre processing requiring DataBase

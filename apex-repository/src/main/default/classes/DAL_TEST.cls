@@ -1,10 +1,25 @@
 @isTest
 private class DAL_TEST {
   @isTest
+  static void givenDALisMocked_whenMockingAgain_thenMockIsReset() {
+    // Arrange
+    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
+    RepositoryService repoService = DAL.repoService;
+
+    // Act
+    DAL.UnitTestDouble newdalUnitTestDouble = DAL.mock();
+
+    // Assert
+    RepositoryService newRepoService = DAL.repoService;
+    Assert.isTrue(repoService !== newRepoService);
+    Assert.isTrue(dalUnitTestDouble !== newdalUnitTestDouble);
+  }
+
+  @isTest
   static void givenDALisMocked_whenChangingMode_thenMockStillApplies() {
     // Arrange
-    Mock repoMock = DAL.mock();
-    MethodSpy insertSpy = repoMock.spyOn('insertRecords');
+    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
+    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
     DAL.setDefaultMode();
     Expect.that(insertSpy).hasNotBeenCalled();
 
@@ -18,13 +33,13 @@ private class DAL_TEST {
   @isTest
   static void givenDALisMocked_whenCallingAPI_thenItCallsMock() {
     // Arrange
-    Mock repoMock = DAL.mock();
-    MethodSpy insertSpy = repoMock.spyOn('insertRecords');
-    MethodSpy updateSpy = repoMock.spyOn('updateRecords');
-    MethodSpy upsertSpy = repoMock.spyOn('upsertRecords');
-    MethodSpy deleteSpy = repoMock.spyOn('deleteRecords');
-    MethodSpy querySpy = repoMock.spyOn('query');
-    MethodSpy findSpy = repoMock.spyOn('find');
+    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
+    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
+    MethodSpy updateSpy = dalUnitTestDouble.spyOnUpdate();
+    MethodSpy upsertSpy = dalUnitTestDouble.spyOnUpsert();
+    MethodSpy deleteSpy = dalUnitTestDouble.spyOnDelete();
+    MethodSpy querySpy = dalUnitTestDouble.spyOnQuery();
+    MethodSpy findSpy = dalUnitTestDouble.spyOnFind();
     Expect.that(insertSpy).hasNotBeenCalled();
     Expect.that(updateSpy).hasNotBeenCalled();
     Expect.that(upsertSpy).hasNotBeenCalled();
@@ -55,8 +70,8 @@ private class DAL_TEST {
   @isTest
   static void givenDALisMocked_whenUnmocking_thenMockStopApplying() {
     // Arrange
-    Mock repoMock = DAL.mock();
-    MethodSpy insertSpy = repoMock.spyOn('insertRecords');
+    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
+    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
     Expect.that(insertSpy).hasNotBeenCalled();
     DAL.unmock();
 
