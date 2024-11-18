@@ -271,6 +271,75 @@ private class RepositoryServiceTest {
   }
 
   @IsTest
+  static void givenRepositoryWithSharingAsSystem_whenUndeleteRecords_thenDeleteResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithSharing();
+
+    Account acc1 = new Account(Name = 'Test Account 1');
+    List<SObject> records = new List<SObject>{ acc1 };
+    Database.DmlOptions options = new Database.DmlOptions();
+    sut.insertRecords(records, options);
+    sut.deleteRecords(records, false);
+
+    // Act
+    List<Database.UndeleteResult> results = sut.undeleteRecords(records, false);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
+    for (Database.UndeleteResult result : results) {
+      Assert.isTrue(result.isSuccess(), 'Expected save to be successful');
+      Assert.areNotEqual(null, result.getId(), 'Expected ID to be returned');
+    }
+  }
+
+  @IsTest
+  static void givenRepositoryWithoutSharingAsSystem_whenUndeleteRecords_thenDeleteResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asSystemWithoutSharing();
+
+    Account acc1 = new Account(Name = 'Test Account 1');
+    List<SObject> records = new List<SObject>{ acc1 };
+    Database.DmlOptions options = new Database.DmlOptions();
+    sut.insertRecords(records, options);
+    sut.deleteRecords(records, false);
+
+    // Act
+    List<Database.UndeleteResult> results = sut.undeleteRecords(records, false);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
+    for (Database.UndeleteResult result : results) {
+      Assert.isTrue(result.isSuccess(), 'Expected save to be successful');
+      Assert.areNotEqual(null, result.getId(), 'Expected ID to be returned');
+    }
+  }
+
+  @IsTest
+  static void givenRepositoryWithSharingAsUser_whenUndeleteRecords_thenDeleteResults() {
+    // Arrange
+    RepositoryFactory repoFactory = new RepositoryFactory();
+    RepositoryService sut = repoFactory.asUser();
+
+    Account acc1 = new Account(Name = 'Test Account 1');
+    List<SObject> records = new List<SObject>{ acc1 };
+    Database.DmlOptions options = new Database.DmlOptions();
+    sut.insertRecords(records, options);
+    sut.deleteRecords(records, false);
+
+    // Act
+    List<Database.UndeleteResult> results = sut.undeleteRecords(records, false);
+
+    // Assert
+    Assert.areEqual(1, results.size(), 'Expected one DeleteResult records');
+    for (Database.UndeleteResult result : results) {
+      Assert.isTrue(result.isSuccess(), 'Expected save to be successful');
+      Assert.areNotEqual(null, result.getId(), 'Expected ID to be returned');
+    }
+  }
+
+  @IsTest
   static void givenRepositoryWithSharingAsSystem_whenQueryString_thenReturnResults() {
     // Arrange
     RepositoryFactory repoFactory = new RepositoryFactory();
