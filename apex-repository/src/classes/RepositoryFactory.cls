@@ -77,6 +77,12 @@ public inherited sharing virtual class RepositoryFactory {
       return result;
     }
 
+    public virtual List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, final Boolean allOrNone) {
+      final List<Database.UndeleteResult> result = Database.undelete(records, allOrNone == true, this.mode);
+
+      return result;
+    }
+
     public virtual List<SObject> query(final String soql, final Map<String, Object> bindMap) {
       return Database.queryWithBinds(soql, bindMap, this.mode);
     }
