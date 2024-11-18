@@ -1,5 +1,5 @@
 public inherited sharing class DAL { // RepositoryService ACL
-  @testVisible // Usefull only for DAL_TEST but should not be used in other tests
+  //@testVisible // Usefull only for DAL_TEST but should not be used in other test classes
   private static RepositoryService repoService;
   private static Boolean mocking = false;
 

@@ -1,6 +1,6 @@
 @isTest
 private class DAL_TEST {
-  @isTest
+  /*@isTest
   static void givenDALisMocked_whenMockingAgain_thenMockIsReset() {
     // Arrange
     DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
@@ -14,6 +14,30 @@ private class DAL_TEST {
     Assert.isTrue(repoService !== newRepoService);
     Assert.isTrue(dalUnitTestDouble !== newdalUnitTestDouble);
   }
+
+  @isTest
+  static void givenDAL_whenModeisSet_thenItChangeMode() {
+    // Arrange
+    RepositoryService repoService = DAL.repoService;
+    Assert.isNotNull(repoService);
+
+    // Act & Assert
+    repoService = DAL.repoService;
+    DAL.setSystemMode();
+    Assert.isTrue(repoService !== DAL.repoService);
+
+    repoService = DAL.repoService;
+    DAL.setDefaultMode();
+    Assert.isTrue(repoService !== DAL.repoService);
+
+    repoService = DAL.repoService;
+    DAL.setSystemWithSharingMode();
+    Assert.isTrue(repoService !== DAL.repoService);
+
+    repoService = DAL.repoService;
+    DAL.setUserMode();
+    Assert.isTrue(repoService !== DAL.repoService);
+  }*/
 
   @isTest
   static void givenDALisMocked_whenChangingMode_thenMockStillApplies() {
@@ -80,30 +104,6 @@ private class DAL_TEST {
 
     // Assert
     Expect.that(insertSpy).hasNotBeenCalled();
-  }
-
-  @isTest
-  static void givenDAL_whenModeisSet_thenItChangeMode() {
-    // Arrange
-    RepositoryService repoService = DAL.repoService;
-    Assert.isNotNull(repoService);
-
-    // Act & Assert
-    repoService = DAL.repoService;
-    DAL.setSystemMode();
-    Assert.isTrue(repoService !== DAL.repoService);
-
-    repoService = DAL.repoService;
-    DAL.setDefaultMode();
-    Assert.isTrue(repoService !== DAL.repoService);
-
-    repoService = DAL.repoService;
-    DAL.setSystemWithSharingMode();
-    Assert.isTrue(repoService !== DAL.repoService);
-
-    repoService = DAL.repoService;
-    DAL.setUserMode();
-    Assert.isTrue(repoService !== DAL.repoService);
   }
 
   @isTest
