@@ -61,12 +61,14 @@ private class DAL_TEST {
     MethodSpy updateSpy = dalStub.spyOnUpdate();
     MethodSpy upsertSpy = dalStub.spyOnUpsert();
     MethodSpy deleteSpy = dalStub.spyOnDelete();
+    MethodSpy undeleteSpy = dalStub.spyOnUndelete();
     MethodSpy querySpy = dalStub.spyOnQuery();
     MethodSpy findSpy = dalStub.spyOnFind();
     Expect.that(insertSpy).hasNotBeenCalled();
     Expect.that(updateSpy).hasNotBeenCalled();
     Expect.that(upsertSpy).hasNotBeenCalled();
     Expect.that(deleteSpy).hasNotBeenCalled();
+    Expect.that(undeleteSpy).hasNotBeenCalled();
     Expect.that(querySpy).hasNotBeenCalled();
     Expect.that(findSpy).hasNotBeenCalled();
 
@@ -82,6 +84,9 @@ private class DAL_TEST {
 
     DAL.deleteRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(deleteSpy).hasBeenCalled();
+
+    DAL.undeleteRecords(new List<Account>{ new Account(Name = 'test') });
+    Expect.that(undeleteSpy).hasBeenCalled();
 
     DAL.query([SELECT Id FROM Account]);
     Expect.that(querySpy).hasBeenCalled();
@@ -160,6 +165,22 @@ private class DAL_TEST {
     // Act
     List<Database.DeleteResult> results = DAL.deleteRecords(new List<Account>{ acc });
     List<Database.DeleteResult> resultsPartially = DAL.deleteRecordsPartially(new List<Account>{ acc });
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual(1, resultsPartially.size());
+  }
+
+  @isTest
+  static void givenDAL_whenUndeleteRecordsIsCalled_thenItTriesToUndeleteRecords() {
+    // Arrange
+    Account acc = new Account(Name = 'Test');
+    insert acc;
+    delete acc;
+
+    // Act
+    List<Database.UndeleteResult> results = DAL.undeleteRecords(new List<Account>{ acc });
+    List<Database.UndeleteResult> resultsPartially = DAL.undeleteRecordsPartially(new List<Account>{ acc });
 
     // Assert
     Assert.areEqual(1, results.size());

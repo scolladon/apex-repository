@@ -66,6 +66,10 @@ public inherited sharing class DAL { // RepositoryService ACL
       return this.spyOn('deleteRecords');
     }
 
+    public MethodSpy spyOnUndelete() {
+      return this.spyOn('undeleteRecords');
+    }
+
     public MethodSpy spyOnQuery() {
       return this.spyOn('query');
     }
@@ -119,6 +123,12 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
   public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records) {
     return DAL.repoService.deleteRecords(records, false);
+  }
+  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records) {
+    return DAL.repoService.undeleteRecords(records, true);
+  }
+  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records) {
+    return DAL.repoService.undeleteRecords(records, false);
   }
   public static List<SObject> query(final String soql, final Map<String, Object> bindMap) {
     return DAL.repoService.query(soql, bindMap);
