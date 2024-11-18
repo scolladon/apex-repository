@@ -42,10 +42,57 @@ public inherited sharing virtual class RepositoryFactory {
     }
   }
 
+  // Static SOQL and SOSL must be called from a with sharing class and WITH USER_MODE predicat
   private with sharing class RepositoryWithSharingAsUser extends BaseRepository {
     public RepositoryWithSharingAsUser() {
       super(AccessLevel.USER_MODE);
     }
+
+    /*
+    public override List<SObject> query(final List<SObject> soql) {
+      return this.getAccessibleRecords(soql);
+    }
+
+    public override List<List<SObject>> find(final List<List<SObject>> sosl) {
+      final List<List<SObject>> result = new List<List<SObject>>();
+      for (List<SObject> sobjects : sosl) {
+        result.add(this.getAccessibleRecords(sobjects));
+      }
+      return result;
+    }
+
+    private List<SObject> getAccessibleRecords(final List<SObject> sobjects) {
+      SObjectAccessDecision decision = Security.stripInaccessible(AccessType.READABLE, sobjects, true);
+      final List<SObject> strippedSobjects = decision.getRecords();
+      // return this.getSharedRecords(strippedSobjects);
+      return strippedSobjects;
+    }
+
+    private List<SObject> getSharedRecords(final List<SObject> sobjects) {
+      final Set<Id> recordIds = new Set<Id>();
+      for (SObject record : sobjects) {
+        if (record.Id != null) {
+          recordIds.add(record.Id);
+        }
+      }
+
+      if (recordIds.isEmpty()) {
+        return new List<SObject>();
+      }
+      final String typeName = sobjects.getSObjectType().getDescribe().Name;
+      String queryIds = 'SELECT Id FROM ' + typeName + ' WHERE Id IN :recordIds';
+      Set<Id> accessibleRecordIds = new Map<Id, SObject>(this.query(queryIds, new Map<String, Object>{ 'recordIds' => recordIds })).keySet();
+
+      final List<SObject> accessibleSObjects = new List<SObject>();
+      for (SObject sob : sobjects) {
+        if (accessibleRecordIds.contains(sob.Id)) {
+          accessibleSObjects.add(sob);
+        }
+      }
+
+      return accessibleSObjects;
+    }
+    */
   }
 
   private inherited sharing abstract class BaseRepository implements RepositoryService {
@@ -73,6 +120,12 @@ public inherited sharing virtual class RepositoryFactory {
 
     public virtual List<Database.DeleteResult> deleteRecords(final List<SObject> records, final Boolean allOrNone) {
       final List<Database.DeleteResult> result = Database.delete(records, allOrNone == true, this.mode);
+
+      return result;
+    }
+
+    public virtual List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, final Boolean allOrNone) {
+      final List<Database.UndeleteResult> result = Database.undelete(records, allOrNone == true, this.mode);
 
       return result;
     }

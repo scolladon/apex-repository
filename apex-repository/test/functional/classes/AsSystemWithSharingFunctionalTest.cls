@@ -150,6 +150,51 @@ private class AsSystemWithSharingFunctionalTest {
   }
 
   @isTest
+  static void whenRecordIsAccessible_undelete_thenRecordIsUndeleted() {
+    // Arrange
+    final FunctionalDataFactory dataFactory = new FunctionalDataFactory();
+    final RepositoryFactory repoFactory = new RepositoryFactory();
+    final RepositoryService sut = repoFactory.asSystemWithSharing();
+    RepositoryTestSubject__c testSubject = dataFactory.buildTestSubject();
+
+    System.runAs(dataFactory.getMinimalAccessUser()) {
+      insert testSubject;
+      delete testSubject;
+
+      // Act
+      final List<Database.UndeleteResult> results = sut.undeleteRecords(new List<SObject>{ testSubject }, false);
+
+      // Assert
+      for (Database.UndeleteResult result : results) {
+        Assert.isTrue(result.isSuccess(), 'DML operation should succeed but: ' + result);
+      }
+    }
+  }
+
+  @isTest
+  static void whenRecordIsNotAccessible_undelete_thenRecordIsNotUndeleted() {
+    // Arrange
+    final FunctionalDataFactory dataFactory = new FunctionalDataFactory();
+    final RepositoryFactory repoFactory = new RepositoryFactory();
+    final RepositoryService sut = repoFactory.asSystemWithSharing();
+    RepositoryTestSubject__c testSubject = dataFactory.buildTestSubject();
+    System.runAs(dataFactory.getAdminUser()) {
+      insert testSubject;
+      delete testSubject;
+    }
+
+    System.runAs(dataFactory.getMinimalAccessUser()) {
+      // Act
+      final List<Database.UndeleteResult> results = sut.undeleteRecords(new List<SObject>{ testSubject }, false);
+
+      // Assert
+      for (Database.UndeleteResult result : results) {
+        Assert.isFalse(result.isSuccess(), 'DML operation should succeed but: ' + result);
+      }
+    }
+  }
+
+  @isTest
   static void whenRecordIsAccessible_queryString_thenRecordIsReturned() {
     // Arrange
     final FunctionalDataFactory dataFactory = new FunctionalDataFactory();

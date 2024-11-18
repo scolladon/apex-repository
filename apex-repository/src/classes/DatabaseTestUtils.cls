@@ -37,6 +37,37 @@ public class DatabaseTestUtils {
     }
   }
 
+  public class UndeleteResultBuilder {
+    private Boolean success;
+    private String id;
+    private List<Database.Error> errors;
+
+    public UndeleteResultBuilder() {
+      this.success = true;
+      this.errors = new List<Database.Error>();
+    }
+
+    public UndeleteResultBuilder withSuccess(Boolean success) {
+      this.success = success;
+      return this;
+    }
+
+    public UndeleteResultBuilder withId(String id) {
+      this.id = id;
+      return this;
+    }
+
+    public UndeleteResultBuilder withErrors(List<Database.Error> errors) {
+      this.errors = errors;
+      return this;
+    }
+
+    public Database.UndeleteResult build() {
+      String jsonString = '{"success":' + String.valueOf(success) + ',"id":"' + id + '","errors":' + JSON.serialize(errors) + '}';
+      return (Database.UndeleteResult) JSON.deserialize(jsonString, Database.UndeleteResult.class);
+    }
+  }
+
   public class UpsertResultBuilder {
     private Boolean success;
     private Boolean created;
