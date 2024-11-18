@@ -5,6 +5,7 @@ public class InMemoryRepositoryService implements RepositoryService {
   public List<List<SObject>> updateCallParameters { get; private set; }
   public List<List<SObject>> upsertCallParameters { get; private set; }
   public List<List<SObject>> deleteCallParameters { get; private set; }
+  public List<List<SObject>> undeleteCallParameters { get; private set; }
   public List<Map<String, Object>> queryCallParameters { get; private set; }
   public List<String> findCallParameters { get; private set; }
 
@@ -14,6 +15,7 @@ public class InMemoryRepositoryService implements RepositoryService {
     this.updateCallParameters = new List<List<SObject>>();
     this.upsertCallParameters = new List<List<SObject>>();
     this.deleteCallParameters = new List<List<SObject>>();
+    this.undeleteCallParameters = new List<List<SObject>>();
     this.queryCallParameters = new List<Map<String, Object>>();
 
     this.findCallParameters = new List<String>();
@@ -109,6 +111,24 @@ public class InMemoryRepositoryService implements RepositoryService {
       }
 
       DatabaseTestUtils.DeleteResultBuilder builder = new DatabaseTestUtils.DeleteResultBuilder().withSuccess(deleted).withId(record.Id);
+
+      results.add(builder.build());
+    }
+    return results;
+  }
+
+  public List<Database.UndeleteResult> undeleteRecords(List<SObject> records, Boolean allOrNone) {
+    this.undeleteCallParameters.add(records);
+
+    List<Database.UndeleteResult> results = new List<Database.UndeleteResult>();
+    for (SObject record : records) {
+      SObjectType objectType = record.getSObjectType();
+      if (!this.mockDatabase.containsKey(objectType)) {
+        this.mockDatabase.put(objectType, new List<SObject>());
+      }
+      this.mockDatabase.get(objectType).add(record);
+
+      DatabaseTestUtils.UndeleteResultBuilder builder = new DatabaseTestUtils.UndeleteResultBuilder().withSuccess(true).withId(record.Id);
 
       results.add(builder.build());
     }
