@@ -31,22 +31,22 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   @testVisible
-  private static DAL.UnitTestDouble mock() {
-    final DAL.UnitTestDouble dalMock = new DAL.UnitTestDouble();
-    DAL.repoService = dalMock.getStub();
+  private static DAL.Stub mock() {
+    final DAL.Stub dalMock = new DAL.Stub();
+    DAL.repoService = dalMock.getRepositoryServiceStub();
     DAL.mocking = true;
     return dalMock;
   }
 
   @testVisible
-  private class UnitTestDouble { // Mocking library ACL
+  private class Stub { // Mocking library ACL
     private final Mock repoServiceMock;
 
-    public UnitTestDouble() {
+    public Stub() {
       this.repoServiceMock = Mock.forType(RepositoryService.class);
     }
 
-    private RepositoryService getStub() {
+    private RepositoryService getRepositoryServiceStub() {
       return (RepositoryService) this.repoServiceMock.stub;
     }
 

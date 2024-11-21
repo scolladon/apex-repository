@@ -3,19 +3,18 @@ private class DAL_TEST {
   /*@isTest
   static void givenDALisMocked_whenMockingAgain_thenMockIsReset() {
     // Arrange
-    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
+    DAL.Stub dalStub = DAL.mock();
     RepositoryService repoService = DAL.repoService;
 
     // Act
-    DAL.UnitTestDouble newdalUnitTestDouble = DAL.mock();
+    DAL.Stub newdalStub = DAL.mock();
 
     // Assert
     RepositoryService newRepoService = DAL.repoService;
     Assert.isTrue(repoService !== newRepoService);
-    Assert.isTrue(dalUnitTestDouble !== newdalUnitTestDouble);
+    Assert.isTrue(dalStub !== newdalStub);
   }
-
-  @isTest
+@isTest
   static void givenDAL_whenModeisSet_thenItChangeMode() {
     // Arrange
     RepositoryService repoService = DAL.repoService;
@@ -42,8 +41,8 @@ private class DAL_TEST {
   @isTest
   static void givenDALisMocked_whenChangingMode_thenMockStillApplies() {
     // Arrange
-    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
-    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy insertSpy = dalStub.spyOnInsert();
     DAL.setDefaultMode();
     Expect.that(insertSpy).hasNotBeenCalled();
 
@@ -57,13 +56,13 @@ private class DAL_TEST {
   @isTest
   static void givenDALisMocked_whenCallingAPI_thenItCallsMock() {
     // Arrange
-    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
-    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
-    MethodSpy updateSpy = dalUnitTestDouble.spyOnUpdate();
-    MethodSpy upsertSpy = dalUnitTestDouble.spyOnUpsert();
-    MethodSpy deleteSpy = dalUnitTestDouble.spyOnDelete();
-    MethodSpy querySpy = dalUnitTestDouble.spyOnQuery();
-    MethodSpy findSpy = dalUnitTestDouble.spyOnFind();
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy insertSpy = dalStub.spyOnInsert();
+    MethodSpy updateSpy = dalStub.spyOnUpdate();
+    MethodSpy upsertSpy = dalStub.spyOnUpsert();
+    MethodSpy deleteSpy = dalStub.spyOnDelete();
+    MethodSpy querySpy = dalStub.spyOnQuery();
+    MethodSpy findSpy = dalStub.spyOnFind();
     Expect.that(insertSpy).hasNotBeenCalled();
     Expect.that(updateSpy).hasNotBeenCalled();
     Expect.that(upsertSpy).hasNotBeenCalled();
@@ -94,8 +93,8 @@ private class DAL_TEST {
   @isTest
   static void givenDALisMocked_whenUnmocking_thenMockStopApplying() {
     // Arrange
-    DAL.UnitTestDouble dalUnitTestDouble = DAL.mock();
-    MethodSpy insertSpy = dalUnitTestDouble.spyOnInsert();
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy insertSpy = dalStub.spyOnInsert();
     Expect.that(insertSpy).hasNotBeenCalled();
     DAL.unmock();
 
