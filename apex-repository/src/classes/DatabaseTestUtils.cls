@@ -6,6 +6,17 @@ public class DatabaseTestUtils {
     return sot.getDescribe().getKeyPrefix() + '0'.repeat(12 - result.length()) + result;
   }
 
+  public static SObject setChildRelationshipFields(final SObject sObj, final String childRelationshipName, final List<SObject> children) {
+    final List<Map<String, Object>> serializedChildren = new List<Map<String, Object>>();
+    for (SObject child : children) {
+      serializedChildren.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
+    }
+    final Map<String, Object> dataMap = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(sObj));
+    dataMap.put(childRelationshipName, new Map<String, Object>{ 'totalSize' => children.size(), 'done' => true, 'records' => serializedChildren });
+
+    return (SObject) JSON.deserialize(JSON.serialize(dataMap), SObject.class);
+  }
+
   public class DeleteResultBuilder {
     private Boolean success;
     private String id;
