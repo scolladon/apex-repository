@@ -1,42 +1,41 @@
 @isTest
 private class DAL_TEST {
-  /*@isTest
+  @isTest
   static void givenDALisMocked_whenMockingAgain_thenMockIsReset() {
     // Arrange
     DAL.Stub dalStub = DAL.mock();
-    RepositoryService repoService = DAL.repoService;
+    IDAL repoServiceProxy = DAL.repoServiceProxy;
 
     // Act
     DAL.Stub newdalStub = DAL.mock();
 
     // Assert
-    RepositoryService newRepoService = DAL.repoService;
-    Assert.isTrue(repoService !== newRepoService);
+    Assert.isTrue(repoServiceProxy !== DAL.repoServiceProxy);
     Assert.isTrue(dalStub !== newdalStub);
   }
-@isTest
+  @isTest
   static void givenDAL_whenModeisSet_thenItChangeMode() {
     // Arrange
-    RepositoryService repoService = DAL.repoService;
+    RepositoryService repoService = DAL.repoServiceProxy.getRepositoryService();
     Assert.isNotNull(repoService);
 
     // Act & Assert
-    repoService = DAL.repoService;
+    repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setSystemMode();
-    Assert.isTrue(repoService !== DAL.repoService);
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
 
-    repoService = DAL.repoService;
+    repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setDefaultMode();
-    Assert.isTrue(repoService !== DAL.repoService);
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
 
-    repoService = DAL.repoService;
+    repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setSystemWithSharingMode();
-    Assert.isTrue(repoService !== DAL.repoService);
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
 
-    repoService = DAL.repoService;
+    repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setUserMode();
-    Assert.isTrue(repoService !== DAL.repoService);
-  }*/
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
+  }
 
   @isTest
   static void givenDALisMocked_whenChangingMode_thenMockStillApplies() {
@@ -58,17 +57,27 @@ private class DAL_TEST {
     // Arrange
     DAL.Stub dalStub = DAL.mock();
     MethodSpy insertSpy = dalStub.spyOnInsert();
+    MethodSpy insertPartiallySpy = dalStub.spyOnInsertPartially();
     MethodSpy updateSpy = dalStub.spyOnUpdate();
+    MethodSpy updatePartiallySpy = dalStub.spyOnUpdatePartially();
     MethodSpy upsertSpy = dalStub.spyOnUpsert();
+    MethodSpy upsertPartiallySpy = dalStub.spyOnUpsertPartially();
     MethodSpy deleteSpy = dalStub.spyOnDelete();
+    MethodSpy deletePartiallySpy = dalStub.spyOnDeletePartially();
     MethodSpy undeleteSpy = dalStub.spyOnUndelete();
+    MethodSpy undeletePartiallySpy = dalStub.spyOnUndeletePartially();
     MethodSpy querySpy = dalStub.spyOnQuery();
     MethodSpy findSpy = dalStub.spyOnFind();
     Expect.that(insertSpy).hasNotBeenCalled();
+    Expect.that(insertPartiallySpy).hasNotBeenCalled();
     Expect.that(updateSpy).hasNotBeenCalled();
+    Expect.that(updatePartiallySpy).hasNotBeenCalled();
     Expect.that(upsertSpy).hasNotBeenCalled();
+    Expect.that(upsertPartiallySpy).hasNotBeenCalled();
     Expect.that(deleteSpy).hasNotBeenCalled();
+    Expect.that(deletePartiallySpy).hasNotBeenCalled();
     Expect.that(undeleteSpy).hasNotBeenCalled();
+    Expect.that(undeletePartiallySpy).hasNotBeenCalled();
     Expect.that(querySpy).hasNotBeenCalled();
     Expect.that(findSpy).hasNotBeenCalled();
 
@@ -76,17 +85,32 @@ private class DAL_TEST {
     DAL.insertRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(insertSpy).hasBeenCalled();
 
+    DAL.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    Expect.that(insertPartiallySpy).hasBeenCalled();
+
     DAL.updateRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(updateSpy).hasBeenCalled();
+
+    DAL.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    Expect.that(updatePartiallySpy).hasBeenCalled();
 
     DAL.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id);
     Expect.that(upsertSpy).hasBeenCalled();
 
+    DAL.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id);
+    Expect.that(upsertPartiallySpy).hasBeenCalled();
+
     DAL.deleteRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(deleteSpy).hasBeenCalled();
 
+    DAL.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    Expect.that(deletePartiallySpy).hasBeenCalled();
+
     DAL.undeleteRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(undeleteSpy).hasBeenCalled();
+
+    DAL.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    Expect.that(undeletePartiallySpy).hasBeenCalled();
 
     DAL.query([SELECT Id FROM Account]);
     Expect.that(querySpy).hasBeenCalled();
