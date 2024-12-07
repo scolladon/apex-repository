@@ -13,7 +13,7 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   public static void setDefaultMode() {
-    DAL.setDatabaseAccessMode(new RepositoryFactory().asUser());
+    DAL.setDatabaseAccessMode(new RepositoryFactory().asSystemWithoutSharing());
   }
 
   public static void setUserMode() {
@@ -116,52 +116,84 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   public static List<Database.SaveResult> insertRecords(final List<SObject> records) {
-    return DAL.repoServiceProxy.insertRecords(records);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.insertRecords(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records) {
-    return DAL.repoServiceProxy.insertRecordsPartially(records);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.insertRecordsPartially(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options) {
-    return DAL.repoServiceProxy.insertRecords(records, options);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.insertRecords(records, options);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.SaveResult> updateRecords(final List<SObject> records) {
-    return DAL.repoServiceProxy.updateRecords(records);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.updateRecords(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records) {
-    return DAL.repoServiceProxy.updateRecordsPartially(records);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.updateRecordsPartially(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options) {
-    return DAL.repoServiceProxy.updateRecords(records, options);
+    final List<Database.SaveResult> result = DAL.repoServiceProxy.updateRecords(records, options);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField) {
-    return DAL.repoServiceProxy.upsertRecords(records, externalIDField);
+    final List<Database.UpsertResult> result = DAL.repoServiceProxy.upsertRecords(records, externalIDField);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField) {
-    return DAL.repoServiceProxy.upsertRecordsPartially(records, externalIDField);
+    final List<Database.UpsertResult> result = DAL.repoServiceProxy.upsertRecordsPartially(records, externalIDField);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
-    return DAL.repoServiceProxy.deleteRecords(records);
+    final List<Database.DeleteResult> result = DAL.repoServiceProxy.deleteRecords(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records) {
-    return DAL.repoServiceProxy.deleteRecordsPartially(records);
+    final List<Database.DeleteResult> result = DAL.repoServiceProxy.deleteRecordsPartially(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records) {
-    return DAL.repoServiceProxy.undeleteRecords(records);
+    final List<Database.UndeleteResult> result = DAL.repoServiceProxy.undeleteRecords(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records) {
-    return DAL.repoServiceProxy.undeleteRecordsPartially(records);
+    final List<Database.UndeleteResult> result = DAL.repoServiceProxy.undeleteRecordsPartially(records);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-    return DAL.repoServiceProxy.query(soql, bindMap);
+    final List<SObject> result = DAL.repoServiceProxy.query(soql, bindMap);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<SObject> query(final List<SObject> soql) {
-    return DAL.repoServiceProxy.query(soql);
+    final List<SObject> result = DAL.repoServiceProxy.query(soql);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<List<SObject>> find(final String sosl) {
-    return DAL.repoServiceProxy.find(sosl);
+    final List<List<SObject>> result = DAL.repoServiceProxy.find(sosl);
+    DAL.setDefaultMode();
+    return result;
   }
   public static List<List<SObject>> find(final List<List<SObject>> sosl) {
-    return DAL.repoServiceProxy.find(soSl);
+    final List<List<SObject>> result = DAL.repoServiceProxy.find(soSl);
+    DAL.setDefaultMode();
+    return result;
   }
 
   private class DALImpl implements IDAL {

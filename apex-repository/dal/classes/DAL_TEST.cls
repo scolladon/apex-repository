@@ -13,6 +13,7 @@ private class DAL_TEST {
     Assert.isTrue(repoServiceProxy !== DAL.repoServiceProxy);
     Assert.isTrue(dalStub !== newdalStub);
   }
+
   @isTest
   static void givenDAL_whenModeisSet_thenItChangeMode() {
     // Arrange
@@ -21,20 +22,109 @@ private class DAL_TEST {
 
     // Act & Assert
     repoService = DAL.repoServiceProxy.getRepositoryService();
-    DAL.setSystemMode();
-    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
-
-    repoService = DAL.repoServiceProxy.getRepositoryService();
-    DAL.setDefaultMode();
-    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
-
-    repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setSystemWithSharingMode();
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
+
+    repoService = DAL.repoServiceProxy.getRepositoryService();
+    DAL.setSystemMode();
     Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
 
     repoService = DAL.repoServiceProxy.getRepositoryService();
     DAL.setUserMode();
     Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
+
+    repoService = DAL.repoServiceProxy.getRepositoryService();
+    DAL.setDefaultMode();
+    Assert.isTrue(repoService !== DAL.repoServiceProxy.getRepositoryService());
+  }
+
+  @isTest
+  static void givenDAL_whenCallingMethods_thenItResetDefaultMode() {
+    // Arrange
+    DAL.setDefaultMode();
+    RepositoryService defaultModeRepoService = DAL.repoServiceProxy.getRepositoryService();
+    Assert.isNotNull(defaultModeRepoService);
+
+    // Act & Assert
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.insertRecords(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.insertRecords(new List<SObject>(), new Database.DMLOptions());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.insertRecordsPartially(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.updateRecords(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.updateRecords(new List<SObject>(), new Database.DMLOptions());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.updateRecordsPartially(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.upsertRecords(new List<SObject>(), Account.Id);
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.upsertRecordsPartially(new List<SObject>(), Account.Id);
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.deleteRecords(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.deleteRecordsPartially(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.undeleteRecords(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.undeleteRecordsPartially(new List<SObject>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.query([SELECT Id FROM Account]);
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.query('SELECT Id FROM Account', new Map<String, Object>());
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
+
+    DAL.setUserMode();
+    Assert.isTrue(defaultModeRepoService !== DAL.repoServiceProxy.getRepositoryService());
+    DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
+    Assert.isTrue(defaultModeRepoService === DAL.repoServiceProxy.getRepositoryService());
   }
 
   @isTest
