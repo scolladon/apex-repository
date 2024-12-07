@@ -7,30 +7,53 @@ public inherited sharing class DAL { // RepositoryService ACL
     DAL.staticConstructor();
   }
 
+  public enum DALMode {
+    DEFAULT_MODE,
+    USER_MODE,
+    SYSTEM_MODE,
+    SYSTEM_WITH_SHARING_MODE
+  }
+
   private static void staticConstructor() {
     DAL.repoServiceProxy = new DALImpl();
     DAL.setDefaultMode();
   }
 
   public static void setDefaultMode() {
-    DAL.setDatabaseAccessMode(new RepositoryFactory().asSystemWithoutSharing());
+    DAL.setDatabaseAccessMode(DALMode.DEFAULT_MODE);
   }
 
   public static void setUserMode() {
-    DAL.setDatabaseAccessMode(new RepositoryFactory().asUser());
+    DAL.setDatabaseAccessMode(DALMode.USER_MODE);
   }
 
   public static void setSystemMode() {
-    DAL.setDatabaseAccessMode(new RepositoryFactory().asSystemWithoutSharing());
+    DAL.setDatabaseAccessMode(DALMode.SYSTEM_MODE);
   }
 
   public static void setSystemWithSharingMode() {
-    DAL.setDatabaseAccessMode(new RepositoryFactory().asSystemWithSharing());
+    DAL.setDatabaseAccessMode(DALMode.SYSTEM_WITH_SHARING_MODE);
   }
 
-  private static void setDatabaseAccessMode(final RepositoryService repoService) {
+  private static void setDatabaseAccessMode(final DALMode dalMode) {
     if (DAL.mocking == true) {
       return;
+    }
+
+    RepositoryService reposervice;
+    switch on dalMode {
+      when SYSTEM_WITH_SHARING_MODE {
+        reposervice = new RepositoryFactory().asSystemWithSharing();
+      }
+      when SYSTEM_MODE {
+        reposervice = new RepositoryFactory().asSystemWithoutSharing();
+      }
+      when USER_MODE {
+        reposervice = new RepositoryFactory().asUser();
+      }
+      when DEFAULT_MODE {
+        reposervice = new RepositoryFactory().asSystemWithoutSharing();
+      }
     }
     DAL.repoServiceProxy.setRepositoryService(repoService);
   }
