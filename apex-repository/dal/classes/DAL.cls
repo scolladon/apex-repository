@@ -1,6 +1,6 @@
 public inherited sharing class DAL { // RepositoryService ACL
   public static IDAL repoServiceProxy { get; private set; }
-  private static Boolean mocking = false;
+  private static DALMode currentMode;
 
   static {
     DAL.staticConstructor();
@@ -35,6 +35,10 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   private static void setDatabaseAccessMode(final DALMode dalMode) {
+    if (DAL.currentMode == dalMode) {
+      return;
+    }
+    DAL.currentMode = dalMode;
     RepositoryService reposervice;
     switch on dalMode {
       when SYSTEM_WITH_SHARING_MODE {
@@ -57,6 +61,7 @@ public inherited sharing class DAL { // RepositoryService ACL
   private static DAL.Stub mock() {
     final DAL.Stub dalMock = new DAL.Stub();
     DAL.repoServiceProxy = dalMock.getRepositoryServiceStub();
+    DAL.currentMode = null;
     return dalMock;
   }
 
