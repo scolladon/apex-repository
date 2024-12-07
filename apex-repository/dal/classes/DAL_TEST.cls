@@ -246,40 +246,40 @@ private class DAL_TEST {
 
     // Act & Assert
     DAL.insertRecords(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(insertSpy).hasBeenCalled();
+    Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(insertPartiallySpy).hasBeenCalled();
+    Expect.that(insertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.updateRecords(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(updateSpy).hasBeenCalled();
+    Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(updatePartiallySpy).hasBeenCalled();
+    Expect.that(updatePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id);
-    Expect.that(upsertSpy).hasBeenCalled();
+    Expect.that(upsertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class));
 
     DAL.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id);
-    Expect.that(upsertPartiallySpy).hasBeenCalled();
+    Expect.that(upsertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class));
 
     DAL.deleteRecords(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(deleteSpy).hasBeenCalled();
+    Expect.that(deleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(deletePartiallySpy).hasBeenCalled();
+    Expect.that(deletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.undeleteRecords(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(undeleteSpy).hasBeenCalled();
+    Expect.that(undeleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
-    Expect.that(undeletePartiallySpy).hasBeenCalled();
+    Expect.that(undeletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.query([SELECT Id FROM Account]);
-    Expect.that(querySpy).hasBeenCalled();
+    Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
     DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
-    Expect.that(findSpy).hasBeenCalled();
+    Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(List<List<Account>>.class));
   }
 
   @isTest
