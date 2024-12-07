@@ -128,6 +128,79 @@ private class DAL_TEST {
   }
 
   @isTest
+  static void givenDAL_whenCallingMethodsWithMode_thenItResetDefaultMode() {
+    // Arrange
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy setRepoSpy = dalStub.spyOnSetRepositoryService();
+    Integer callCount = 0;
+
+    // Act & Assert
+    DAL.insertRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.insertRecords(new List<SObject>(), new Database.DMLOptions(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.insertRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.updateRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.updateRecords(new List<SObject>(), new Database.DMLOptions(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.updateRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.upsertRecords(new List<SObject>(), Account.Id, DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.upsertRecordsPartially(new List<SObject>(), Account.Id, DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.deleteRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.deleteRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.undeleteRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.undeleteRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.query([SELECT Id FROM Account], DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.query('SELECT Id FROM Account', new Map<String, Object>(), DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)], DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+
+    DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', DAL.DALMode.USER_MODE);
+    callCount += 2;
+    Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+  }
+
+  @isTest
   static void givenDALisMocked_whenChangingMode_thenMockStillApplies() {
     // Arrange
     DAL.Stub dalStub = DAL.mock();

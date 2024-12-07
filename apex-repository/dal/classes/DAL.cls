@@ -36,10 +36,6 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   private static void setDatabaseAccessMode(final DALMode dalMode) {
-    if (DAL.mocking == true) {
-      return;
-    }
-
     RepositoryService reposervice;
     switch on dalMode {
       when SYSTEM_WITH_SHARING_MODE {
@@ -51,7 +47,7 @@ public inherited sharing class DAL { // RepositoryService ACL
       when USER_MODE {
         reposervice = new RepositoryFactory().asUser();
       }
-      when DEFAULT_MODE {
+      when DEFAULT_MODE, null {
         reposervice = new RepositoryFactory().asSystemWithoutSharing();
       }
     }
@@ -62,14 +58,12 @@ public inherited sharing class DAL { // RepositoryService ACL
   private static DAL.Stub mock() {
     final DAL.Stub dalMock = new DAL.Stub();
     DAL.repoServiceProxy = dalMock.getRepositoryServiceStub();
-    DAL.mocking = true;
     return dalMock;
   }
 
   // For integrated test or post/pre processing requiring DataBase
   @testVisible
   private static void unmock() {
-    DAL.mocking = false;
     DAL.staticConstructor();
   }
 
@@ -131,6 +125,10 @@ public inherited sharing class DAL { // RepositoryService ACL
 
     public MethodSpy spyOnFind() {
       return this.spyOn('find');
+    }
+
+    public MethodSpy spyOnSetRepositoryService() {
+      return this.spyOn('setRepositoryService');
     }
 
     private MethodSpy spyOn(final String methodName) {
@@ -219,7 +217,72 @@ public inherited sharing class DAL { // RepositoryService ACL
     return result;
   }
 
-  private class DALImpl implements IDAL {
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.insertRecords(records);
+  }
+  public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.insertRecordsPartially(records);
+  }
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.insertRecords(records, options);
+  }
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.updateRecords(records);
+  }
+  public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.updateRecordsPartially(records);
+  }
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.updateRecords(records, options);
+  }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.upsertRecords(records, externalIDField);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.upsertRecords(records, externalIDField);
+  }
+  public static List<Database.DeleteResult> deleteRecords(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.deleteRecords(records);
+  }
+  public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.deleteRecordsPartially(records);
+  }
+  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.undeleteRecords(records);
+  }
+  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.undeleteRecordsPartially(records);
+  }
+  public static List<SObject> query(final String soql, final Map<String, Object> bindMap, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.query(soql, bindMap);
+  }
+  public static List<SObject> query(final List<SObject> soql, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.query(soql);
+  }
+  public static List<List<SObject>> find(final String sosl, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.find(sosl);
+  }
+  public static List<List<SObject>> find(final List<List<SObject>> sosl, DALMode dalMode) {
+    DAL.setDatabaseAccessMode(dalMode);
+    return DAL.find(sosl);
+  }
+
+  private inherited sharing class DALImpl implements IDAL {
     private RepositoryService repoService;
 
     public void setRepositoryService(RepositoryService repoService) {
