@@ -251,7 +251,7 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
   public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, DALMode dalMode) {
     DAL.setDatabaseAccessMode(dalMode);
-    return DAL.upsertRecords(records, externalIDField);
+    return DAL.upsertRecordsPartially(records, externalIDField);
   }
   public static List<Database.DeleteResult> deleteRecords(final List<SObject> records, DALMode dalMode) {
     DAL.setDatabaseAccessMode(dalMode);

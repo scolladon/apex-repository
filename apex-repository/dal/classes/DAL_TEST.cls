@@ -132,72 +132,100 @@ private class DAL_TEST {
     // Arrange
     DAL.Stub dalStub = DAL.mock();
     MethodSpy setRepoSpy = dalStub.spyOnSetRepositoryService();
+    MethodSpy insertSpy = dalStub.spyOnInsert();
+    MethodSpy insertPartiallySpy = dalStub.spyOnInsertPartially();
+    MethodSpy updateSpy = dalStub.spyOnUpdate();
+    MethodSpy updatePartiallySpy = dalStub.spyOnUpdatePartially();
+    MethodSpy upsertSpy = dalStub.spyOnUpsert();
+    MethodSpy upsertPartiallySpy = dalStub.spyOnUpsertPartially();
+    MethodSpy deleteSpy = dalStub.spyOnDelete();
+    MethodSpy deletePartiallySpy = dalStub.spyOnDeletePartially();
+    MethodSpy undeleteSpy = dalStub.spyOnUndelete();
+    MethodSpy undeletePartiallySpy = dalStub.spyOnUndeletePartially();
+    MethodSpy querySpy = dalStub.spyOnQuery();
+    MethodSpy findSpy = dalStub.spyOnFind();
     Integer callCount = 0;
 
     // Act & Assert
     DAL.insertRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.insertRecords(new List<SObject>(), new Database.DMLOptions(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.insertRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(insertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.updateRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.updateRecords(new List<SObject>(), new Database.DMLOptions(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.updateRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(updatePartiallySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.upsertRecords(new List<SObject>(), Account.Id, DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(upsertSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class), Argument.ofType(SObjectField.class));
 
     DAL.upsertRecordsPartially(new List<SObject>(), Account.Id, DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(upsertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class), Argument.ofType(SObjectField.class));
 
     DAL.deleteRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(deleteSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.deleteRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(deletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.undeleteRecords(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(undeleteSpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.undeleteRecordsPartially(new List<SObject>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(undeletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.query([SELECT Id FROM Account], DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(List<SObject>.class));
 
     DAL.query('SELECT Id FROM Account', new Map<String, Object>(), DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class));
 
     DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)], DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(List<List<SObject>>.class));
 
     DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', DAL.DALMode.USER_MODE);
     callCount += 2;
     Expect.that(setRepoSpy).hasBeenCalledTimes(callCount);
+    Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(String.class));
   }
 
   @isTest
