@@ -44,94 +44,94 @@ private class DAL_TEST {
     Expect.that(findSpy).hasNotBeenCalled();
 
     // Act & Assert
-    DAL.insertRecords(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.insertRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.insertRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions());
+    DAL.instance.insertRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions());
     Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Database.DMLOptions.class));
 
-    DAL.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') });
     Expect.that(insertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.insertRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.insertRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.insertRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
+    DAL.instance.insertRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
     Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Database.DMLOptions.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.insertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(insertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.updateRecords(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.updateRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.updateRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions());
+    DAL.instance.updateRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions());
     Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Database.DMLOptions.class));
 
-    DAL.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') });
     Expect.that(updatePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.updateRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.updateRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.updateRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
+    DAL.instance.updateRecords(new List<Account>{ new Account(Name = 'test') }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
     Expect.that(updateSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Database.DMLOptions.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.updateRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(updatePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id);
+    DAL.instance.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id);
     Expect.that(upsertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class));
 
-    DAL.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id);
+    DAL.instance.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id);
     Expect.that(upsertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class));
 
-    DAL.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id, AccessLevel.SYSTEM_MODE);
+    DAL.instance.upsertRecords(new List<Account>{ new Account(Name = 'test') }, Account.Id, AccessLevel.SYSTEM_MODE);
     Expect.that(upsertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id, AccessLevel.SYSTEM_MODE);
+    DAL.instance.upsertRecordsPartially(new List<Account>{ new Account(Name = 'test') }, Account.Id, AccessLevel.SYSTEM_MODE);
     Expect.that(upsertPartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), Argument.ofType(Schema.SObjectField.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.deleteRecords(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.deleteRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(deleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
     Expect.that(deletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.deleteRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.deleteRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(deleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.deleteRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(deletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.undeleteRecords(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.undeleteRecords(new List<Account>{ new Account(Name = 'test') });
     Expect.that(undeleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') });
     Expect.that(undeletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.undeleteRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.undeleteRecords(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(undeleteSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
+    DAL.instance.undeleteRecordsPartially(new List<Account>{ new Account(Name = 'test') }, AccessLevel.SYSTEM_MODE);
     Expect.that(undeletePartiallySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.query([SELECT Id FROM Account]);
+    DAL.instance.query([SELECT Id FROM Account]);
     Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
 
-    DAL.query('SELECT Id FROM Account', new Map<String, Object>());
+    DAL.instance.query('SELECT Id FROM Account', new Map<String, Object>());
     Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class));
 
-    DAL.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE);
+    DAL.instance.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE);
     Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class), AccessLevel.SYSTEM_MODE);
 
-    DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
+    DAL.instance.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(List<List<Account>>.class));
 
-    DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
+    DAL.instance.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(String.class));
 
-    DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
+    DAL.instance.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(String.class), AccessLevel.SYSTEM_MODE);
   }
 
@@ -144,7 +144,7 @@ private class DAL_TEST {
     DAL.unmock();
 
     // Act
-    DAL.insertRecords(new List<Account>{ new Account(Name = 'test') });
+    DAL.instance.insertRecords(new List<Account>{ new Account(Name = 'test') });
 
     // Assert
     Expect.that(insertSpy).hasNotBeenCalled();
@@ -156,12 +156,12 @@ private class DAL_TEST {
     Account acc = new Account(Name = 'Test');
 
     // Act
-    List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ acc });
-    List<Database.SaveResult> resultsOptions = DAL.insertRecords(new List<Account>{ acc }, new Database.DMLOptions());
-    List<Database.SaveResult> resultsPartially = DAL.insertRecordsPartially(new List<Account>{ acc });
-    List<Database.SaveResult> resultsWithMode = DAL.insertRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsOptionsWithMode = DAL.insertRecords(new List<Account>{ acc }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsPartiallyWithMode = DAL.insertRecordsPartially(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> results = DAL.instance.insertRecords(new List<Account>{ acc });
+    List<Database.SaveResult> resultsOptions = DAL.instance.insertRecords(new List<Account>{ acc }, new Database.DMLOptions());
+    List<Database.SaveResult> resultsPartially = DAL.instance.insertRecordsPartially(new List<Account>{ acc });
+    List<Database.SaveResult> resultsWithMode = DAL.instance.insertRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsOptionsWithMode = DAL.instance.insertRecords(new List<Account>{ acc }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsPartiallyWithMode = DAL.instance.insertRecordsPartially(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -178,12 +178,12 @@ private class DAL_TEST {
     Account acc = new Account(Name = 'Test');
 
     // Act
-    List<Database.SaveResult> results = DAL.updateRecords(new List<Account>{ acc });
-    List<Database.SaveResult> resultsOptions = DAL.updateRecords(new List<Account>{ acc }, new Database.DMLOptions());
-    List<Database.SaveResult> resultsPartially = DAL.updateRecordsPartially(new List<Account>{ acc });
-    List<Database.SaveResult> resultsWithMode = DAL.updateRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsOptionsWithMode = DAL.updateRecords(new List<Account>{ acc }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsPartiallyWithMode = DAL.updateRecordsPartially(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> results = DAL.instance.updateRecords(new List<Account>{ acc });
+    List<Database.SaveResult> resultsOptions = DAL.instance.updateRecords(new List<Account>{ acc }, new Database.DMLOptions());
+    List<Database.SaveResult> resultsPartially = DAL.instance.updateRecordsPartially(new List<Account>{ acc });
+    List<Database.SaveResult> resultsWithMode = DAL.instance.updateRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsOptionsWithMode = DAL.instance.updateRecords(new List<Account>{ acc }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsPartiallyWithMode = DAL.instance.updateRecordsPartially(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -200,10 +200,10 @@ private class DAL_TEST {
     Account acc = new Account(Name = 'Test');
 
     // Act
-    List<Database.UpsertResult> results = DAL.upsertRecords(new List<Account>{ acc }, Account.Id);
-    List<Database.UpsertResult> resultsPartially = DAL.upsertRecordsPartially(new List<Account>{ acc }, Account.Id);
-    List<Database.UpsertResult> resultsWithMode = DAL.upsertRecords(new List<Account>{ acc }, Account.Id, AccessLevel.SYSTEM_MODE);
-    List<Database.UpsertResult> resultsPartiallyWithMode = DAL.upsertRecordsPartially(new List<Account>{ acc }, Account.Id, AccessLevel.SYSTEM_MODE);
+    List<Database.UpsertResult> results = DAL.instance.upsertRecords(new List<Account>{ acc }, Account.Id);
+    List<Database.UpsertResult> resultsPartially = DAL.instance.upsertRecordsPartially(new List<Account>{ acc }, Account.Id);
+    List<Database.UpsertResult> resultsWithMode = DAL.instance.upsertRecords(new List<Account>{ acc }, Account.Id, AccessLevel.SYSTEM_MODE);
+    List<Database.UpsertResult> resultsPartiallyWithMode = DAL.instance.upsertRecordsPartially(new List<Account>{ acc }, Account.Id, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -220,10 +220,10 @@ private class DAL_TEST {
     insert new List<Account>{ acc, accMode };
 
     // Act
-    List<Database.DeleteResult> results = DAL.deleteRecords(new List<Account>{ acc });
-    List<Database.DeleteResult> resultsPartially = DAL.deleteRecordsPartially(new List<Account>{ acc });
-    List<Database.DeleteResult> resultsWithMode = DAL.deleteRecords(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
-    List<Database.DeleteResult> resultsPartiallyWithMode = DAL.deleteRecordsPartially(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
+    List<Database.DeleteResult> results = DAL.instance.deleteRecords(new List<Account>{ acc });
+    List<Database.DeleteResult> resultsPartially = DAL.instance.deleteRecordsPartially(new List<Account>{ acc });
+    List<Database.DeleteResult> resultsWithMode = DAL.instance.deleteRecords(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
+    List<Database.DeleteResult> resultsPartiallyWithMode = DAL.instance.deleteRecordsPartially(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -242,10 +242,10 @@ private class DAL_TEST {
     delete new List<Account>{ acc, accMode };
 
     // Act
-    List<Database.UndeleteResult> results = DAL.undeleteRecords(new List<Account>{ acc });
-    List<Database.UndeleteResult> resultsPartially = DAL.undeleteRecordsPartially(new List<Account>{ acc });
-    List<Database.UndeleteResult> resultsWithMode = DAL.undeleteRecords(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
-    List<Database.UndeleteResult> resultsPartiallyWithMode = DAL.undeleteRecordsPartially(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
+    List<Database.UndeleteResult> results = DAL.instance.undeleteRecords(new List<Account>{ acc });
+    List<Database.UndeleteResult> resultsPartially = DAL.instance.undeleteRecordsPartially(new List<Account>{ acc });
+    List<Database.UndeleteResult> resultsWithMode = DAL.instance.undeleteRecords(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
+    List<Database.UndeleteResult> resultsPartiallyWithMode = DAL.instance.undeleteRecordsPartially(new List<Account>{ accMode }, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -257,9 +257,9 @@ private class DAL_TEST {
   @isTest
   static void givenDAL_whenQueryIsCalled_thenItTriesToQueryRecords() {
     // Act
-    List<SObject> resultsStatic = DAL.query([SELECT Id FROM Account]);
-    List<SObject> resultsDynamic = DAL.query('SELECT Id FROM Account', new Map<String, Object>());
-    List<SObject> resultsDynamicWithMode = DAL.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE);
+    List<SObject> resultsStatic = DAL.instance.query([SELECT Id FROM Account]);
+    List<SObject> resultsDynamic = DAL.instance.query('SELECT Id FROM Account', new Map<String, Object>());
+    List<SObject> resultsDynamicWithMode = DAL.instance.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(0, resultsStatic.size());
@@ -270,9 +270,9 @@ private class DAL_TEST {
   @isTest
   static void givenDAL_whenFindIsCalled_thenItTriesToFindRecords() {
     // Act
-    List<List<SObject>> resultsStatic = DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
-    List<List<SObject>> resultsDynamic = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
-    List<List<SObject>> resultsDynamicWithMode = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
+    List<List<SObject>> resultsStatic = DAL.instance.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
+    List<List<SObject>> resultsDynamic = DAL.instance.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
+    List<List<SObject>> resultsDynamicWithMode = DAL.instance.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(0, resultsStatic[0].size());

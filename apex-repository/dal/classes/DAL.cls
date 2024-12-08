@@ -1,4 +1,4 @@
-public inherited sharing class DAL { // RepositoryService ACL
+public inherited sharing class DAL implements IDAL { // RepositoryService ACL
   public static IDAL instance { get; private set; }
 
   static {
@@ -6,7 +6,7 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   private static void staticConstructor() {
-    DAL.instance = new DALImpl();
+    DAL.instance = new DAL();
   }
 
   @testVisible
@@ -87,224 +87,134 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
   }
 
-  public static List<Database.SaveResult> insertRecords(final List<SObject> records) {
-    return DAL.instance.insertRecords(records);
-  }
-  public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records) {
-    return DAL.instance.insertRecordsPartially(records);
-  }
-  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options) {
-    return DAL.instance.insertRecords(records, options);
-  }
-  public static List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.insertRecords(records, accessLevel);
-  }
-  public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.insertRecordsPartially(records, accessLevel);
-  }
-  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
-    return DAL.instance.insertRecords(records, options, accessLevel);
-  }
-  public static List<Database.SaveResult> updateRecords(final List<SObject> records) {
-    return DAL.instance.updateRecords(records);
-  }
-  public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records) {
-    return DAL.instance.updateRecordsPartially(records);
-  }
-  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options) {
-    return DAL.instance.updateRecords(records, options);
-  }
-  public static List<Database.SaveResult> updateRecords(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.updateRecords(records, accessLevel);
-  }
-  public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.updateRecordsPartially(records, accessLevel);
-  }
-  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
-    return DAL.instance.updateRecords(records, options, accessLevel);
-  }
-  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField) {
-    return DAL.instance.upsertRecords(records, externalIDField);
-  }
-  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField) {
-    return DAL.instance.upsertRecordsPartially(records, externalIDField);
-  }
-  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
-    return DAL.instance.upsertRecords(records, externalIDField, accessLevel);
-  }
-  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
-    return DAL.instance.upsertRecordsPartially(records, externalIDField, accessLevel);
-  }
-  public static List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
-    return DAL.instance.deleteRecords(records);
-  }
-  public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records) {
-    return DAL.instance.deleteRecordsPartially(records);
-  }
-  public static List<Database.DeleteResult> deleteRecords(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.deleteRecords(records, accessLevel);
-  }
-  public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.deleteRecordsPartially(records, accessLevel);
-  }
-  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records) {
-    return DAL.instance.undeleteRecords(records);
-  }
-  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records) {
-    return DAL.instance.undeleteRecordsPartially(records);
-  }
-  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.undeleteRecords(records, accessLevel);
-  }
-  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-    return DAL.instance.undeleteRecordsPartially(records, accessLevel);
-  }
-  public static List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-    return DAL.instance.query(soql, bindMap);
-  }
-  public static List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
-    return DAL.instance.query(soql, bindMap, accessLevel);
-  }
-  public static List<SObject> query(final List<SObject> soql) {
-    return DAL.instance.query(soql);
-  }
-  public static List<List<SObject>> find(final String sosl) {
-    return DAL.instance.find(sosl);
-  }
-  public static List<List<SObject>> find(final String sosl, AccessLevel accessLevel) {
-    return DAL.instance.find(sosl, accessLevel);
-  }
-  public static List<List<SObject>> find(final List<List<SObject>> sosl) {
-    return DAL.instance.find(soSl);
+  private DAL() {
   }
 
-  private inherited sharing class DALImpl implements IDAL {
-    public List<Database.SaveResult> insertRecords(final List<SObject> records) {
-      return Database.insert(records, new Database.DmlOptions());
-    }
+  public List<Database.SaveResult> insertRecords(final List<SObject> records) {
+    return Database.insert(records, new Database.DmlOptions());
+  }
 
-    public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records) {
-      final Database.DmlOptions options = new Database.DmlOptions();
-      options.OptAllOrNone = false;
-      return Database.insert(records, options);
-    }
+  public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records) {
+    final Database.DmlOptions options = new Database.DmlOptions();
+    options.OptAllOrNone = false;
+    return Database.insert(records, options);
+  }
 
-    public List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options) {
-      return Database.insert(records, options);
-    }
+  public List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options) {
+    return Database.insert(records, options);
+  }
 
-    public List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.insert(records, new Database.DmlOptions());
-    }
+  public List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.insert(records, new Database.DmlOptions());
+  }
 
-    public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-      final Database.DmlOptions options = new Database.DmlOptions();
-      options.OptAllOrNone = false;
-      return Database.insert(records, options);
-    }
+  public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
+    final Database.DmlOptions options = new Database.DmlOptions();
+    options.OptAllOrNone = false;
+    return Database.insert(records, options);
+  }
 
-    public List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
-      return Database.insert(records, options);
-    }
+  public List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
+    return Database.insert(records, options);
+  }
 
-    public List<Database.SaveResult> updateRecords(final List<SObject> records) {
-      return Database.update(records, new Database.DmlOptions());
-    }
+  public List<Database.SaveResult> updateRecords(final List<SObject> records) {
+    return Database.update(records, new Database.DmlOptions());
+  }
 
-    public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records) {
-      final Database.DmlOptions options = new Database.DmlOptions();
-      options.OptAllOrNone = false;
-      return Database.update(records, options);
-    }
+  public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records) {
+    final Database.DmlOptions options = new Database.DmlOptions();
+    options.OptAllOrNone = false;
+    return Database.update(records, options);
+  }
 
-    public List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options) {
-      return Database.update(records, options);
-    }
+  public List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options) {
+    return Database.update(records, options);
+  }
 
-    public List<Database.SaveResult> updateRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.update(records, new Database.DmlOptions(), accessLevel);
-    }
+  public List<Database.SaveResult> updateRecords(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.update(records, new Database.DmlOptions(), accessLevel);
+  }
 
-    public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-      final Database.DmlOptions options = new Database.DmlOptions();
-      options.OptAllOrNone = false;
-      return Database.update(records, options, accessLevel);
-    }
+  public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
+    final Database.DmlOptions options = new Database.DmlOptions();
+    options.OptAllOrNone = false;
+    return Database.update(records, options, accessLevel);
+  }
 
-    public List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
-      return Database.update(records, options, accessLevel);
-    }
+  public List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
+    return Database.update(records, options, accessLevel);
+  }
 
-    public List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField) {
-      return Database.upsert(records, externalIDField, true);
-    }
+  public List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField) {
+    return Database.upsert(records, externalIDField, true);
+  }
 
-    public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField) {
-      return Database.upsert(records, externalIDField, false);
-    }
+  public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField) {
+    return Database.upsert(records, externalIDField, false);
+  }
 
-    public List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
-      return Database.upsert(records, externalIDField, true, accessLevel);
-    }
+  public List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
+    return Database.upsert(records, externalIDField, true, accessLevel);
+  }
 
-    public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
-      return Database.upsert(records, externalIDField, false, accessLevel);
-    }
+  public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
+    return Database.upsert(records, externalIDField, false, accessLevel);
+  }
 
-    public List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
-      return Database.delete(records, true);
-    }
+  public List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
+    return Database.delete(records, true);
+  }
 
-    public List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records) {
-      return Database.delete(records, false);
-    }
+  public List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records) {
+    return Database.delete(records, false);
+  }
 
-    public List<Database.DeleteResult> deleteRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.delete(records, true, accessLevel);
-    }
+  public List<Database.DeleteResult> deleteRecords(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.delete(records, true, accessLevel);
+  }
 
-    public List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.delete(records, false, accessLevel);
-    }
+  public List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.delete(records, false, accessLevel);
+  }
 
-    public List<Database.UndeleteResult> undeleteRecords(final List<SObject> records) {
-      return Database.undelete(records, true);
-    }
+  public List<Database.UndeleteResult> undeleteRecords(final List<SObject> records) {
+    return Database.undelete(records, true);
+  }
 
-    public List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records) {
-      return Database.undelete(records, false);
-    }
+  public List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records) {
+    return Database.undelete(records, false);
+  }
 
-    public List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.undelete(records, true, accessLevel);
-    }
+  public List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.undelete(records, true, accessLevel);
+  }
 
-    public List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.undelete(records, false, accessLevel);
-    }
+  public List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
+    return Database.undelete(records, false, accessLevel);
+  }
 
-    public List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-      return Database.queryWithBinds(soql, bindMap, AccessLevel.SYSTEM_MODE);
-    }
+  public List<SObject> query(final String soql, final Map<String, Object> bindMap) {
+    return Database.queryWithBinds(soql, bindMap, AccessLevel.SYSTEM_MODE);
+  }
 
-    public List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
-      return Database.queryWithBinds(soql, bindMap, accessLevel);
-    }
+  public List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
+    return Database.queryWithBinds(soql, bindMap, accessLevel);
+  }
 
-    public List<SObject> query(final List<SObject> soql) {
-      return soql;
-    }
+  public List<SObject> query(final List<SObject> soql) {
+    return soql;
+  }
 
-    public List<List<SObject>> find(final String sosl) {
-      return Search.query(sosl);
-    }
+  public List<List<SObject>> find(final String sosl) {
+    return Search.query(sosl);
+  }
 
-    public List<List<SObject>> find(final String sosl, AccessLevel accessLevel) {
-      return Search.query(sosl, accessLevel);
-    }
+  public List<List<SObject>> find(final String sosl, AccessLevel accessLevel) {
+    return Search.query(sosl, accessLevel);
+  }
 
-    public List<List<SObject>> find(final List<List<SObject>> sosl) {
-      return sosl;
-    }
+  public List<List<SObject>> find(final List<List<SObject>> sosl) {
+    return sosl;
   }
 }
