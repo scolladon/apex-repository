@@ -194,17 +194,17 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.insert(records, new Database.DmlOptions());
+      return Database.insert(records, new Database.DmlOptions(), accessLevel);
     }
 
     public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
       final Database.DmlOptions options = new Database.DmlOptions();
       options.OptAllOrNone = false;
-      return Database.insert(records, options);
+      return Database.insert(records, options, accessLevel);
     }
 
     public List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel) {
-      return Database.insert(records, options);
+      return Database.insert(records, options, accessLevel);
     }
 
     public List<Database.SaveResult> updateRecords(final List<SObject> records) {
