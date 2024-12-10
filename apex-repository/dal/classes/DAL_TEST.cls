@@ -279,4 +279,20 @@ private class DAL_TEST {
     Assert.areEqual(0, resultsDynamic[0].size());
     Assert.areEqual(0, resultsDynamicWithMode[0].size());
   }
+
+  @isTest
+  static void givenDAL_AggregateResult() {
+    DAL.query([SELECT Count(id) FROM Account]);
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy querySpy = dalStub.spyOnQuery();
+    AggregateResult aggResult = (AggregateResult) DatabaseTestUtils.makeData(AggregateResult.class, new Map<String, Object>{ 'CountId' => 1 });
+    querySpy.returns(new List<AggregateResult>{ aggResult });
+
+    // Act
+    List<AggregateResult> results = DAL.query([SELECT Count(id) CountId FROM Account]);
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Expect.that(querySpy).hasBeenCalled();
+  }
 }

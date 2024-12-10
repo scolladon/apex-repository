@@ -6,145 +6,78 @@ public class DatabaseTestUtils {
     return sot.getDescribe().getKeyPrefix() + '0'.repeat(12 - result.length()) + result;
   }
 
-  public static SObject setChildRelationshipFields(final SObject sObj, final String childRelationshipName, final List<SObject> children) {
-    final List<Map<String, Object>> serializedChildren = new List<Map<String, Object>>();
-    for (SObject child : children) {
-      serializedChildren.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
+  public static Object makeData(final Type sobjectType, final Map<String, Object> data) {
+    for (String fieldName : data.keySet()) {
+      final Object fieldValue = data.get(fieldName);
+      if (fieldValue instanceof List<SObject>) {
+        List<Map<String, Object>> serializedChildren = new List<Map<String, Object>>();
+        for (SObject child : (List<SObject>) fieldValue) {
+          serializedChildren.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
+        }
+        data.put(fieldName, new Map<String, Object>{ 'totalSize' => ((List<Object>) fieldValue).size(), 'done' => true, 'records' => serializedChildren });
+      } else if (fieldValue instanceof List<Object>) {
+        List<Map<String, Object>> serializedChildren = new List<Map<String, Object>>();
+        for (Object child : (List<Object>) fieldValue) {
+          serializedChildren.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
+        }
+        data.put(fieldName, serializedChildren);
+      } else if (fieldValue instanceof SObject) {
+        data.put(fieldName, (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(fieldValue)));
+      }
     }
-    final Map<String, Object> dataMap = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(sObj));
-    dataMap.put(childRelationshipName, new Map<String, Object>{ 'totalSize' => children.size(), 'done' => true, 'records' => serializedChildren });
 
-    return (SObject) JSON.deserialize(JSON.serialize(dataMap), SObject.class);
+    return JSON.deserialize(JSON.serialize(data), sobjectType);
   }
-
-  public class DeleteResultBuilder {
-    private Boolean success;
-    private String id;
-    private List<Database.Error> errors;
-
-    public DeleteResultBuilder() {
-      this.success = true;
-      this.errors = new List<Database.Error>();
-    }
-
-    public DeleteResultBuilder withSuccess(Boolean success) {
-      this.success = success;
-      return this;
-    }
-
-    public DeleteResultBuilder withId(String id) {
-      this.id = id;
-      return this;
-    }
-
-    public DeleteResultBuilder withErrors(List<Database.Error> errors) {
-      this.errors = errors;
-      return this;
-    }
-
-    public Database.DeleteResult build() {
-      String jsonString = '{"success":' + String.valueOf(success) + ',"id":"' + id + '","errors":' + JSON.serialize(errors) + '}';
-      return (Database.DeleteResult) JSON.deserialize(jsonString, Database.DeleteResult.class);
+  /* Execute Anonymous
+  // AggregateResult
+AggregateResult aggResult = (AggregateResult) DAL.makeData(
+  AggregateResult.class, 
+  new Map<String, Object>{ 'field' => 'value' }
+);
+System.Debug(aggResult);
+// Database.SaveResult
+Database.SaveResult result =  (Database.SaveResult) DAL.makeData(Database.SaveResult.class, new Map<String, Object>{
+  'success'=>true,
+  'id' => 'value',
+  'errors' => new List<Object>{
+    new Map<String, Object> {
+      'message' => 'error message',
+      'statusCode' => 42
     }
   }
+});
+System.Debug(result);
+Opportunity opp = (Opportunity) DAL.makeData(Opportunity.class, new Map<String, Object>{
+    'Name'=>'Oppy', 
+    'Account'=>new Account(Name='Test'),
+    'IsClosed'=>true,
+        'OpportunityTeamMembers'=>new List<OpportunityTeamMember>{
+            new OpportunityTeamMember(TeamMemberRole='Leader')
+        }
+        });
 
-  public class UndeleteResultBuilder {
-    private Boolean success;
-    private String id;
-    private List<Database.Error> errors;
-
-    public UndeleteResultBuilder() {
-      this.success = true;
-      this.errors = new List<Database.Error>();
-    }
-
-    public UndeleteResultBuilder withSuccess(Boolean success) {
-      this.success = success;
-      return this;
-    }
-
-    public UndeleteResultBuilder withId(String id) {
-      this.id = id;
-      return this;
-    }
-
-    public UndeleteResultBuilder withErrors(List<Database.Error> errors) {
-      this.errors = errors;
-      return this;
-    }
-
-    public Database.UndeleteResult build() {
-      String jsonString = '{"success":' + String.valueOf(success) + ',"id":"' + id + '","errors":' + JSON.serialize(errors) + '}';
-      return (Database.UndeleteResult) JSON.deserialize(jsonString, Database.UndeleteResult.class);
-    }
+Account acc = (Account) DAL.makeData(Account.class, new Map<String, Object>{
+  'Name'=>'Account',
+  'IsPersonAccount' => true,
+  'Parent' => new Account(
+    Name='Parent', 
+    Parent=new Account(
+      Name='GrandParent'
+    )
+  ),
+  'Opportunities' => new List<Opportunity>{
+    opp
   }
-
-  public class UpsertResultBuilder {
-    private Boolean success;
-    private Boolean created;
-    private String id;
-    private List<Database.Error> errors;
-
-    public UpsertResultBuilder() {
-      this.success = true;
-      this.created = false;
-      this.errors = new List<Database.Error>();
-    }
-
-    public UpsertResultBuilder withSuccess(Boolean success) {
-      this.success = success;
-      return this;
-    }
-
-    public UpsertResultBuilder withCreated(Boolean created) {
-      this.created = created;
-      return this;
-    }
-
-    public UpsertResultBuilder withId(String id) {
-      this.id = id;
-      return this;
-    }
-
-    public UpsertResultBuilder withErrors(List<Database.Error> errors) {
-      this.errors = errors;
-      return this;
-    }
-
-    public Database.UpsertResult build() {
-      String jsonString = '{"success":' + String.valueOf(success) + ',"created":' + String.valueOf(created) + ',"id":"' + id + '","errors":' + JSON.serialize(errors) + '}';
-      return (Database.UpsertResult) JSON.deserialize(jsonString, Database.UpsertResult.class);
-    }
-  }
-
-  public class SaveResultBuilder {
-    private Boolean success;
-    private String id;
-    private List<Database.Error> errors;
-
-    public SaveResultBuilder() {
-      this.success = true;
-      this.errors = new List<Database.Error>();
-    }
-
-    public SaveResultBuilder withSuccess(Boolean success) {
-      this.success = success;
-      return this;
-    }
-
-    public SaveResultBuilder withId(String id) {
-      this.id = id;
-      return this;
-    }
-
-    public SaveResultBuilder withErrors(List<Database.Error> errors) {
-      this.errors = errors;
-      return this;
-    }
-
-    public Database.SaveResult build() {
-      String jsonString = '{"success":' + String.valueOf(success) + ',"id":"' + id + '","errors":' + JSON.serialize(errors) + '}';
-      return (Database.SaveResult) JSON.deserialize(jsonString, Database.SaveResult.class);
-    }
-  }
+});
+System.Debug(acc);
+System.Debug(acc.Name);
+System.Debug(acc.IsPersonAccount);
+System.Debug(acc.Parent);
+System.Debug(acc.Parent.Parent);
+System.Debug(acc.Opportunities);
+System.Debug(acc.Opportunities[0].Account);
+System.Debug(acc.Opportunities[0].IsClosed);
+System.Debug(acc.Opportunities[0].OpportunityTeamMembers);
+System.Debug(acc.Opportunities[0].OpportunityTeamMembers[0].TeamMemberRole);
+*/
 }
