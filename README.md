@@ -1,50 +1,111 @@
-# apex repository
+# Salesforce Data Access Layer (DAL)
 
-## Description
-
-`RepositoryFactory` is an **Apex** class designed to manage database operations with different sharing and security levels. It provides a flexible way to perform CRUD operations (Create, Read, Update, Delete) based on the security mode:
-
-- **With Sharing in System Mode**: Executes operations respecting sharing rules but ignoring the user’s field and object permissions.
-- **Without Sharing in System Mode**: Executes operations ignoring both sharing rules and user permissions.
-- **With Sharing in User Mode**: Executes operations while enforcing the current user’s permissions, field-level security, and sharing rules.
-
-This structure allows for flexibility in handling database operations depending on the specific access and sharing requirements.
+A robust Data Access Layer for Salesforce that simplifies database operations and makes your code more testable.
 
 ## Features
 
-- **Flexible Sharing Modes**: The library supports system and user sharing modes, allowing you to execute database operations based on the desired security context.
-- **CRUD Operations**: Supports create, update, upsert, and delete operations on Salesforce objects.
-- **SOQL and SOSL Queries**: Provides functionality to execute SOQL queries and SOSL searches within the specified access mode.
-- **Customizable DML Options**: DML operations can be customized using `Database.DmlOptions`.
-- **In memory DB implementation**: Provides capability to mock DB for Testing purpose
+- Unified interface for all database operations (DML)
+- Support for partial operations and access levels
+- Easy mocking capabilities for unit tests
+- Type-safe operations
+- Encapsulates Database operations complexity
+
+## Prerequisites
+
+This library depends on [Apex-Mockery](https://github.com/link-to-apex-mockery). Make sure to install it first.
 
 ## Installation
 
-1. Clone or download the repository.
-2. Add the `RepositoryFactory` class to your own repo
+1. Install Apex-Mockery
+2. Deploy the following files to your org:
+   - `IDAL.cls`
+   - `DAL.cls`
+   - `DatabaseTestUtils.cls` (optional - for testing utilities)
 
 ## Usage
 
-For additional examples and best practices on how to use the RepositoryFactory class, you can refer to the recipe files located in the folder: [`apex-repository/recipes/classes`](https://github.com/scolladon/apex-repository/tree/main/apex-repository/recipes/classes).
+### Production Code
 
-You can use another mock for your services instead of using the In Memory Mock provided (or use another lib to generate the mock for you and configure the stubs according to your needs).
+````apex
+// Insert records
+Account newAccount = new Account(Name = 'Test Account');
+List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ newAccount });
 
-These examples provide detailed demonstrations of how to implement various CRUD operations and queries using the different security modes provided by the RepositoryFactory.
+// Insert with partial success allowed
+List<Database.SaveResult> partialResults = DAL.insertRecordsPartially(new List<Account>{ newAccount });
 
-## Class Structure
+// Update records
+Account existingAccount = [SELECT Id, Name FROM Account LIMIT 1];
+existingAccount.Name = 'Updated Name';
+DAL.updateRecords(new List<Account>{ existingAccount });
 
-### RepositoryFactory
+// Query records
+List<Account> accounts = DAL.query([SELECT Id, Name FROM Account WHERE Name LIKE 'Test%']);
 
-`asSystemWithSharing()`: Returns an instance of RepositoryService with system mode and sharing rules enabled.
+// Dynamic query with bind variables
+Map<String, Object> bindVars = new Map<String, Object>{'name' => 'Test%'};
+List<Account> accounts = DAL.query('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars);
 
-`asSystemWithoutSharing()`: Returns an instance of RepositoryService without sharing rules.
+// SOSL search
+List<List<SObject>> searchResults = DAL.find([FIND 'Test' IN ALL FIELDS RETURNING Account(Id, Name)]);
 
-`asUser()`: Returns an instance of RepositoryService enforcing the current user’s sharing and permissions.
+### Test Code
+```apex
+@isTest
+static void testAccountCreation() {
+    // Arrange
+    DAL.Stub dalStub = DAL.mock();
+    MethodSpy insertSpy = dalStub.spyOnInsert();
 
-### RepositoryService
+    Account testAccount = new Account(Name = 'Test');
+    Database.SaveResult mockResult = (Database.SaveResult)DatabaseTestUtils.makeData(
+        Database.SaveResult.class,
+        new Map<String, Object>{
+            'success' => true,
+            'id' => DatabaseTestUtils.getFakeId(Account.SObjectType)
+        }
+    );
+    insertSpy.returns(new List<Database.SaveResult>{ mockResult });
 
-Interface contract with the world.
+    // Act
+    List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ testAccount });
 
-### InMemoryRepositoryService
+    // Assert
+    Assert.isTrue(results[0].isSuccess());
+    Expect.that(insertSpy).hasBeenCalledWith(Argument.ofType(List<Account>.class));
+}
+````
 
-In Memory repository service implementation for testing purpose only.
+## Advanced Feature
+
+**System Mode Operations**
+Execute operations with system privileges:
+
+```apex
+DAL.insertRecords(records, AccessLevel.SYSTEM_MODE);
+DAL.updateRecords(records, AccessLevel.SYSTEM_MODE);
+DAL.queryRecords(soql, bindMap, AccessLevel.SYSTEM_MODE);
+```
+
+**DML Options**
+Customize DML operations with Database.DMLOptions:
+
+```apex
+Database.DMLOptions options = new Database.DMLOptions();
+options.optAllOrNone = true;
+options.allowFieldTruncation = true;
+
+DAL.insertRecords(records, options);
+```
+
+## Best Practices
+
+1. Always use DAL instead of direct Database operations
+2. Handle operation results appropriately
+3. Use partial operations when appropriate
+4. Mock DAL in unit tests for better isolation
+5. Use System Mode operations sparingly and only when necessary
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

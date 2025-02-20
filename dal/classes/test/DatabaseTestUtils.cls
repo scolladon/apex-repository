@@ -1,3 +1,4 @@
+@IsTest
 public class DatabaseTestUtils {
   static Integer identifier = 1;
   public static String getFakeId(Schema.SObjectType sot) {

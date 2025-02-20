@@ -1,20 +1,8 @@
 {
   "packageDirectories": [
     {
-      "path": "apex-repository/src",
+      "path": "dal",
       "default": true
-    },
-    {
-      "path": "apex-repository/test/unit",
-      "default": false
-    },
-    {
-      "path": "apex-repository/test/functional",
-      "default": false
-    },
-    {
-      "path": "apex-repository/recipes",
-      "default": false
     }
   ],
   "name": "poc",
