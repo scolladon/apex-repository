@@ -78,6 +78,10 @@ public inherited sharing class DAL { // RepositoryService ACL
       return this.spyOn('query');
     }
 
+    public MethodSpy spyOnQueryAggregate() {
+      return this.spyOn('queryAggregate');
+    }
+
     public MethodSpy spyOnFind() {
       return this.spyOn('find');
     }
@@ -167,6 +171,9 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
   public static List<SObject> query(final List<SObject> soql) {
     return DAL.instance.query(soql);
+  }
+  public static List<AggregateResultProxy> queryAggregate(final List<AggregateResult> aggregateResults) {
+    return DAL.instance.queryAggregate(aggregateResults);
   }
   public static List<List<SObject>> find(final String sosl) {
     return DAL.instance.find(sosl);
@@ -293,6 +300,14 @@ public inherited sharing class DAL { // RepositoryService ACL
 
     public List<SObject> query(final List<SObject> soql) {
       return soql;
+    }
+
+    public List<AggregateResultProxy> queryAggregate(final List<AggregateResult> aggregateResults) {
+      AggregateResultProxy[] aggregateResultProxies = new List<AggregateResultProxy>();
+      for (AggregateResult aggregateResult : aggregateResults) {
+        aggregateResultProxies.add(new AggregateResultProxy(aggregateResult));
+      }
+      return aggregateResultProxies;
     }
 
     public List<List<SObject>> find(final String sosl) {

@@ -98,6 +98,16 @@ options.allowFieldTruncation = true;
 DAL.insertRecords(records, options);
 ```
 
+**AggregateResultProxy**
+
+```apex
+List<AggregateResultProxy> aggregateResults = DAL.queryAggregate([SELECT Count(Id) countId FROM Account WHERE Name LIKE 'Test%']);
+for(AggregateResultProxy aggregateResult : aggregateResults) {
+    Integer countId = (Integer)aggregateResult.get('countId');
+    // Do something with countId
+}
+```
+
 ## Best Practices
 
 1. Always use DAL instead of direct Database operations
