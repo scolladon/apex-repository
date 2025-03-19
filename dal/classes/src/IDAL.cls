@@ -27,6 +27,7 @@ public interface IDAL {
   List<SObject> query(String soql, Map<String, Object> bindMap, AccessLevel accessLevel);
   List<SObject> query(List<SObject> soql);
   List<AggregateResultProxy> queryAggregate(List<AggregateResult> aggregateResults);
+  Integer queryCount(Integer count);
   List<List<SObject>> find(String sosl);
   List<List<SObject>> find(String sosl, AccessLevel accessLevel);
   List<List<SObject>> find(List<List<SObject>> sosl);

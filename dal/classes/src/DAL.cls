@@ -9,7 +9,7 @@ public inherited sharing class DAL { // RepositoryService ACL
     DAL.instance = new DALImpl();
   }
 
-  @testVisible
+  @TestVisible
   private static DAL.Stub mock() {
     final DAL.Stub dalMock = new DAL.Stub();
     DAL.instance = dalMock.getStub();
@@ -17,12 +17,22 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   // For integrated test or post/pre processing requiring DataBase
-  @testVisible
+  @TestVisible
   private static void unmock() {
     DAL.staticConstructor();
   }
 
-  @testVisible
+  @TestVisible
+  private class InsertMock implements MethodSpy.SpyBehavior {
+    public Object execute(final List<Object> params) {
+      for (SObject sob : (List<SObject>) params[0]) {
+        sob.Id = DatabaseTestUtils.getFakeId(sob.getSObjectType());
+      }
+      return null;
+    }
+  }
+
+  @TestVisible
   private class Stub { // Mocking library ACL
     private final Mock dalMock;
 
@@ -35,11 +45,15 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public MethodSpy spyOnInsert() {
-      return this.spyOn('insertRecords');
+      final MethodSpy insertSpy = this.spyOn('insertRecords');
+      insertSpy.behaves(new InsertMock());
+      return insertSpy;
     }
 
     public MethodSpy spyOnInsertPartially() {
-      return this.spyOn('insertRecordsPartially');
+      final MethodSpy insertPartiallySpy = this.spyOn('insertRecordsPartially');
+      insertPartiallySpy.behaves(new InsertMock());
+      return insertPartiallySpy;
     }
 
     public MethodSpy spyOnUpdate() {
@@ -80,6 +94,10 @@ public inherited sharing class DAL { // RepositoryService ACL
 
     public MethodSpy spyOnQueryAggregate() {
       return this.spyOn('queryAggregate');
+    }
+
+    public MethodSpy spyOnQueryCount() {
+      return this.spyOn('queryCount');
     }
 
     public MethodSpy spyOnFind() {
@@ -174,6 +192,9 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
   public static List<AggregateResultProxy> queryAggregate(final List<AggregateResult> aggregateResults) {
     return DAL.instance.queryAggregate(aggregateResults);
+  }
+  public static Integer queryCount(final Integer count) {
+    return DAL.instance.queryCount(count);
   }
   public static List<List<SObject>> find(final String sosl) {
     return DAL.instance.find(sosl);
@@ -308,6 +329,10 @@ public inherited sharing class DAL { // RepositoryService ACL
         aggregateResultProxies.add(new AggregateResultProxy(aggregateResult));
       }
       return aggregateResultProxies;
+    }
+
+    public Integer queryCount(final Integer count) {
+      return count;
     }
 
     public List<List<SObject>> find(final String sosl) {

@@ -30,6 +30,7 @@ private class DAL_TEST {
     MethodSpy undeletePartiallySpy = dalStub.spyOnUndeletePartially();
     MethodSpy querySpy = dalStub.spyOnQuery();
     MethodSpy queryAggregateSpy = dalStub.spyOnQueryAggregate();
+    MethodSpy queryCountSpy = dalStub.spyOnQueryCount();
     MethodSpy findSpy = dalStub.spyOnFind();
     Expect.that(insertSpy).hasNotBeenCalled();
     Expect.that(insertPartiallySpy).hasNotBeenCalled();
@@ -43,6 +44,7 @@ private class DAL_TEST {
     Expect.that(undeletePartiallySpy).hasNotBeenCalled();
     Expect.that(querySpy).hasNotBeenCalled();
     Expect.that(queryAggregateSpy).hasNotBeenCalled();
+    Expect.that(queryCountSpy).hasNotBeenCalled();
     Expect.that(findSpy).hasNotBeenCalled();
 
     // Act & Assert
@@ -129,6 +131,9 @@ private class DAL_TEST {
 
     DAL.queryAggregate([SELECT Count(Id) countId FROM Account]);
     Expect.that(queryAggregateSpy).hasBeenCalledWith(Argument.ofType(List<AggregateResult>.class));
+
+    DAL.queryCount([SELECT COUNT() FROM Account]);
+    Expect.that(queryCountSpy).hasBeenCalledWith(Argument.ofType(Integer.class));
 
     DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(List<List<Account>>.class));
@@ -281,6 +286,15 @@ private class DAL_TEST {
 
     // Assert
     Assert.areEqual(1, resultsAggregate.size());
+  }
+
+  @isTest
+  static void givenDAL_whenQueryCountIsCalled_thenItTriesToReturnsCount() {
+    // Act
+    Integer count = DAL.queryCount([SELECT COUNT() FROM Account]);
+
+    // Assert
+    Assert.areEqual(0, count);
   }
 
   @isTest
