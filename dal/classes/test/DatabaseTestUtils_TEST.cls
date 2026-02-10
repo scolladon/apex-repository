@@ -54,7 +54,6 @@ private class DatabaseTestUtils_TEST {
   @isTest
   static void makeData_SObject_withParentRelationship() {
     // Arrange
-    final Map<String, Object> values = new Map<String, Object>{ 'Name' => 'Account' };
 
     // Act
     Account acc = (Account) DatabaseTestUtils.makeData(Account.class, new Map<String, Object>{ 'Parent' => new Account(Name = 'Parent') });
@@ -80,7 +79,6 @@ private class DatabaseTestUtils_TEST {
   @isTest
   static void makeData_SObject_withChildRelationship() {
     // Arrange
-    final Map<String, Object> values = new Map<String, Object>{ 'Name' => 'Account' };
 
     // Act
     Account acc = (Account) DatabaseTestUtils.makeData(Account.class, new Map<String, Object>{ 'Opportunities' => new List<Opportunity>{ new Opportunity(Name = 'Oppy') } });

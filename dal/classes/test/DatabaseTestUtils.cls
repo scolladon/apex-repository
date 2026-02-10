@@ -7,35 +7,24 @@ public class DatabaseTestUtils {
   }
 
   public static Object makeData(final Type sobjectType, final Map<String, Object> data) {
+    Map<String, Object> dataResult = new Map<String, Object>();
     for (String fieldName : data.keySet()) {
-      Object fieldValue = data.get(fieldName);
+      Object fieldValue = data.get(fieldName); // Lookup | Primitive
       if (fieldValue instanceof List<SObject>) {
-        List<Object> children = objectToList(fieldValue);
+        // ChildRelationShip
+        final List<Map<String, Object>> children = new List<Map<String, Object>>();
+        for (Object child : (List<Object>) fieldValue) {
+          if (child instanceof Map<String, Object>) {
+            children.add((Map<String, Object>) child);
+          } else {
+            children.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
+          }
+        }
         fieldValue = new Map<String, Object>{ 'totalSize' => children.size(), 'done' => true, 'records' => children };
-      } else if (fieldValue instanceof List<Object>) {
-        fieldValue = objectToList(fieldValue);
-      } else if (fieldValue instanceof SObject) {
-        fieldValue = objectToMap(fieldValue);
       }
-      data.put(fieldName, fieldValue);
+      dataResult.put(fieldName, fieldValue);
     }
 
-    return mapToObject(sobjectType, data);
-  }
-
-  private static List<Map<String, Object>> objectToList(final Object fieldValue) {
-    final List<Map<String, Object>> children = new List<Map<String, Object>>();
-    for (Object child : (List<Object>) fieldValue) {
-      children.add(objectToMap(child));
-    }
-    return children;
-  }
-
-  private static Map<String, Object> objectToMap(final Object obj) {
-    return (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(obj));
-  }
-
-  private static Object mapToObject(final Type sobjectType, final Map<String, Object> objectMap) {
-    return JSON.deserialize(JSON.serialize(objectMap), sobjectType);
+    return JSON.deserialize(JSON.serialize(dataResult), sobjectType);
   }
 }
