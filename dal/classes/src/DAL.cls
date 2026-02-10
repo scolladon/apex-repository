@@ -157,6 +157,18 @@ public inherited sharing class DAL { // RepositoryService ACL
   public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel) {
     return DAL.instance.upsertRecordsPartially(records, externalIDField, accessLevel);
   }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records) {
+    return DAL.instance.upsertRecords(records);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records) {
+    return DAL.instance.upsertRecordsPartially(records);
+  }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final AccessLevel accessLevel) {
+    return DAL.instance.upsertRecords(records, accessLevel);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final AccessLevel accessLevel) {
+    return DAL.instance.upsertRecordsPartially(records, accessLevel);
+  }
   public static List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
     return DAL.instance.deleteRecords(records);
   }
@@ -279,6 +291,22 @@ public inherited sharing class DAL { // RepositoryService ACL
       return Database.upsert(records, externalIDField, false, accessLevel);
     }
 
+    public List<Database.UpsertResult> upsertRecords(final List<SObject> records) {
+      return Database.upsert(records, true);
+    }
+
+    public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records) {
+      return Database.upsert(records, false);
+    }
+
+    public List<Database.UpsertResult> upsertRecords(final List<SObject> records, final AccessLevel accessLevel) {
+      return Database.upsert(records, true, accessLevel);
+    }
+
+    public List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final AccessLevel accessLevel) {
+      return Database.upsert(records, false, accessLevel);
+    }
+
     public List<Database.DeleteResult> deleteRecords(final List<SObject> records) {
       return Database.delete(records, true);
     }
@@ -312,11 +340,11 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-      return Database.queryWithBinds(soql, bindMap, AccessLevel.SYSTEM_MODE);
+      return Database.queryWithBinds(String.escapeSingleQuotes(soql), bindMap, AccessLevel.SYSTEM_MODE);
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
-      return Database.queryWithBinds(soql, bindMap, accessLevel);
+      return Database.queryWithBinds(String.escapeSingleQuotes(soql), bindMap, accessLevel);
     }
 
     public List<SObject> query(final List<SObject> soql) {
@@ -336,11 +364,11 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<List<SObject>> find(final String sosl) {
-      return Search.query(sosl);
+      return Search.query(String.escapeSingleQuotes(sosl));
     }
 
     public List<List<SObject>> find(final String sosl, AccessLevel accessLevel) {
-      return Search.query(sosl, accessLevel);
+      return Search.query(String.escapeSingleQuotes(sosl), accessLevel);
     }
 
     public List<List<SObject>> find(final List<List<SObject>> sosl) {

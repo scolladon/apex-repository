@@ -15,6 +15,10 @@ public interface IDAL {
   List<Database.UpsertResult> upsertRecordsPartially(List<SObject> records, Schema.SObjectField externalIDField);
   List<Database.UpsertResult> upsertRecords(List<SObject> records, Schema.SObjectField externalIDField, AccessLevel accessLevel);
   List<Database.UpsertResult> upsertRecordsPartially(List<SObject> records, Schema.SObjectField externalIDField, AccessLevel accessLevel);
+  List<Database.UpsertResult> upsertRecords(List<SObject> records);
+  List<Database.UpsertResult> upsertRecordsPartially(List<SObject> records);
+  List<Database.UpsertResult> upsertRecords(List<SObject> records, AccessLevel accessLevel);
+  List<Database.UpsertResult> upsertRecordsPartially(List<SObject> records, AccessLevel accessLevel);
   List<Database.DeleteResult> deleteRecords(List<SObject> records);
   List<Database.DeleteResult> deleteRecordsPartially(List<SObject> records);
   List<Database.DeleteResult> deleteRecords(List<SObject> records, AccessLevel accessLevel);
