@@ -340,11 +340,11 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-      return Database.queryWithBinds(String.escapeSingleQuotes(soql), bindMap, AccessLevel.SYSTEM_MODE);
+      return Database.queryWithBinds(soql, bindMap, AccessLevel.SYSTEM_MODE);
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
-      return Database.queryWithBinds(String.escapeSingleQuotes(soql), bindMap, accessLevel);
+      return Database.queryWithBinds(soql, bindMap, accessLevel);
     }
 
     public List<SObject> query(final List<SObject> soql) {
@@ -364,11 +364,11 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<List<SObject>> find(final String sosl) {
-      return Search.query(String.escapeSingleQuotes(sosl));
+      return Search.query(sosl);
     }
 
     public List<List<SObject>> find(final String sosl, AccessLevel accessLevel) {
-      return Search.query(String.escapeSingleQuotes(sosl), accessLevel);
+      return Search.query(sosl, accessLevel);
     }
 
     public List<List<SObject>> find(final List<List<SObject>> sosl) {
