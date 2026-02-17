@@ -219,12 +219,20 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
 
   private inherited sharing class DALImpl implements IDAL {
+    // Note: here, no Database.DmlOptions is given, so it creates a new instance of it, but the attributes there gets null value, so it behaves as a partial DML since OptAllOrNone is null, as if it was false.
+    // The following alternatives are also valid to enforce allOrNone behavior:
+    //   return Database.insert(records, true);                  // explicit allOrNone = true
+    //   final Database.DmlOptions options = new Database.DmlOptions();
+    //   options.OptAllOrNone = true;
+    //   return Database.insert(records, options);               // explicit DmlOptions with OptAllOrNone = true
+    // But the simplest form already defaults to allOrNone = true
     public List<Database.SaveResult> insertRecords(final List<SObject> records) {
-      return Database.insert(records, new Database.DmlOptions());
+      return Database.insert(records);
     }
 
     public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records) {
       final Database.DmlOptions options = new Database.DmlOptions();
+      // Note: this is not needed, since leaving it as null would behave as false, but for clarity of the intention of the method, it's being set explicitly
       options.OptAllOrNone = false;
       return Database.insert(records, options);
     }
@@ -233,12 +241,14 @@ public inherited sharing class DAL { // RepositoryService ACL
       return Database.insert(records, options);
     }
 
+    // Note: here, no Database.DmlOptions is given, so it creates a new instance of it, but the attributes there gets null value, so it behaves as a partial DML since OptAllOrNone is null, as if it was false.
     public List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.insert(records, new Database.DmlOptions(), accessLevel);
+      return Database.insert(records, accessLevel);
     }
 
     public List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
       final Database.DmlOptions options = new Database.DmlOptions();
+      // Note: this is not needed, since leaving it as null would behave as false, but for clarity of the intention of the method, it's being set explicitly
       options.OptAllOrNone = false;
       return Database.insert(records, options, accessLevel);
     }
@@ -247,12 +257,14 @@ public inherited sharing class DAL { // RepositoryService ACL
       return Database.insert(records, options, accessLevel);
     }
 
+    // Note: here, no Database.DmlOptions is given, so it creates a new instance of it, but the attributes there gets null value, so it behaves as a partial DML since OptAllOrNone is null, as if it was false.
     public List<Database.SaveResult> updateRecords(final List<SObject> records) {
-      return Database.update(records, new Database.DmlOptions());
+      return Database.update(records);
     }
 
     public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records) {
       final Database.DmlOptions options = new Database.DmlOptions();
+      // Note: this is not needed, since leaving it as null would behave as false, but for clarity of the intention of the method, it's being set explicitly
       options.OptAllOrNone = false;
       return Database.update(records, options);
     }
@@ -261,12 +273,14 @@ public inherited sharing class DAL { // RepositoryService ACL
       return Database.update(records, options);
     }
 
+    // Note: here, no Database.DmlOptions is given, so it creates a new instance of it, but the attributes there gets null value, so it behaves as a partial DML since OptAllOrNone is null, as if it was false.
     public List<Database.SaveResult> updateRecords(final List<SObject> records, AccessLevel accessLevel) {
-      return Database.update(records, new Database.DmlOptions(), accessLevel);
+      return Database.update(records, accessLevel);
     }
 
     public List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, AccessLevel accessLevel) {
       final Database.DmlOptions options = new Database.DmlOptions();
+      // Note: this is not needed, since leaving it as null would behave as false, but for clarity of the intention of the method, it's being set explicitly
       options.OptAllOrNone = false;
       return Database.update(records, options, accessLevel);
     }
