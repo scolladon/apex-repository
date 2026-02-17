@@ -32,6 +32,53 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
   }
 
+  // DML Mocking by mockId (similar to SOQL.mockId)
+  private static Map<String, DmlMock> dmlIdToMock = new Map<String, DmlMock>();
+
+  @TestVisible
+  private static DmlMockable mock(String mockId) {
+    final DmlMock dmlMock = new DmlMock();
+    DAL.dmlIdToMock.put(mockId, dmlMock);
+    return dmlMock;
+  }
+
+  @TestVisible
+  private interface DmlMockable {
+    void throwException();
+    void throwException(String message);
+  }
+
+  @TestVisible
+  private class DmlMock implements DmlMockable {
+    private DmlException mockException;
+
+    public void throwException() {
+      this.throwException('DML mock exception');
+    }
+
+    public void throwException(String message) {
+      this.mockException = new DmlException();
+      this.mockException.setMessage(message);
+    }
+
+    public Boolean hasException() {
+      return this.mockException != null;
+    }
+
+    public void execute(final List<SObject> records, final Boolean assignIds) {
+      if (this.hasException()) {
+        throw this.mockException;
+      }
+      if (assignIds) {
+        for (SObject sob : records) {
+          if (sob.Id == null) {
+            sob.Id = DatabaseTestUtils.getFakeId(sob.getSObjectType());
+          }
+        }
+      }
+    }
+  }
+
   @TestVisible
   private class Stub { // Mocking library ACL
     private final Mock dalMock;
@@ -216,6 +263,209 @@ public inherited sharing class DAL { // RepositoryService ACL
   }
   public static List<List<SObject>> find(final List<List<SObject>> sosl) {
     return DAL.instance.find(soSl);
+  }
+
+  // DML methods with mockId support (similar to SOQL.mockId)
+  // Insert with mockId
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecords(records);
+  }
+  public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecordsPartially(records);
+  }
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecords(records, options);
+  }
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecords(records, accessLevel);
+  }
+  public static List<Database.SaveResult> insertRecordsPartially(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecordsPartially(records, accessLevel);
+  }
+  public static List<Database.SaveResult> insertRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.insertRecords(records, options, accessLevel);
+  }
+  // Update with mockId
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecords(records);
+  }
+  public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecordsPartially(records);
+  }
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecords(records, options);
+  }
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecords(records, accessLevel);
+  }
+  public static List<Database.SaveResult> updateRecordsPartially(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecordsPartially(records, accessLevel);
+  }
+  public static List<Database.SaveResult> updateRecords(final List<SObject> records, final Database.DmlOptions options, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.updateRecords(records, options, accessLevel);
+  }
+  // Upsert with mockId
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecords(records, externalIDField);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecordsPartially(records, externalIDField);
+  }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecords(records, externalIDField, accessLevel);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final Schema.SObjectField externalIDField, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecordsPartially(records, externalIDField, accessLevel);
+  }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecords(records);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecordsPartially(records);
+  }
+  public static List<Database.UpsertResult> upsertRecords(final List<SObject> records, final AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecords(records, accessLevel);
+  }
+  public static List<Database.UpsertResult> upsertRecordsPartially(final List<SObject> records, final AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, true);
+      return null;
+    }
+    return DAL.instance.upsertRecordsPartially(records, accessLevel);
+  }
+  // Delete with mockId
+  public static List<Database.DeleteResult> deleteRecords(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.deleteRecords(records);
+  }
+  public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.deleteRecordsPartially(records);
+  }
+  public static List<Database.DeleteResult> deleteRecords(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.deleteRecords(records, accessLevel);
+  }
+  public static List<Database.DeleteResult> deleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.deleteRecordsPartially(records, accessLevel);
+  }
+  // Undelete with mockId
+  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.undeleteRecords(records);
+  }
+  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.undeleteRecordsPartially(records);
+  }
+  public static List<Database.UndeleteResult> undeleteRecords(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.undeleteRecords(records, accessLevel);
+  }
+  public static List<Database.UndeleteResult> undeleteRecordsPartially(final List<SObject> records, AccessLevel accessLevel, final String mockId) {
+    if (DAL.dmlIdToMock.containsKey(mockId)) {
+      DAL.dmlIdToMock.get(mockId).execute(records, false);
+      return null;
+    }
+    return DAL.instance.undeleteRecordsPartially(records, accessLevel);
   }
 
   private inherited sharing class DALImpl implements IDAL {

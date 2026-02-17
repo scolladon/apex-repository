@@ -309,4 +309,142 @@ private class DAL_TEST {
     Assert.areEqual(0, resultsDynamic[0].size());
     Assert.areEqual(0, resultsDynamicWithMode[0].size());
   }
+
+  // mockId-based DML mocking tests
+
+  @isTest
+  static void givenMockId_whenInsertRecordsIsCalled_thenMockAssignsFakeIds() {
+    // Arrange
+    DAL.mock('insertAccounts');
+    DAL.mock('insertContacts');
+    Account acc = new Account(Name = 'Test Account');
+    Contact con = new Contact(LastName = 'Test Contact');
+
+    // Act
+    DAL.insertRecords(new List<Account>{ acc }, 'insertAccounts');
+    DAL.insertRecords(new List<Contact>{ con }, 'insertContacts');
+
+    // Assert
+    Assert.isNotNull(acc.Id, 'Account should have a fake Id assigned');
+    Assert.isNotNull(con.Id, 'Contact should have a fake Id assigned');
+    Assert.isTrue(acc.Id != con.Id, 'Each record should get a unique fake Id');
+  }
+
+  @isTest
+  static void givenMockId_whenMultipleInsertsUseDifferentMockIds_thenEachIsMockedIndependently() {
+    // Arrange
+    DAL.mock('insertFirst');
+    DAL.mock('insertSecond').throwException('Second insert failed');
+    Account acc = new Account(Name = 'First');
+    Account acc2 = new Account(Name = 'Second');
+
+    // Act
+    DAL.insertRecords(new List<Account>{ acc }, 'insertFirst');
+
+    // Assert - first insert succeeds
+    Assert.isNotNull(acc.Id);
+
+    // Act & Assert - second insert throws
+    try {
+      DAL.insertRecords(new List<Account>{ acc2 }, 'insertSecond');
+      Assert.fail('Expected DmlException');
+    } catch (DmlException e) {
+      Assert.isTrue(e.getMessage().contains('Second insert failed'));
+    }
+  }
+
+  @isTest
+  static void givenMockId_whenNoMockRegistered_thenDelegatesToInstance() {
+    // Arrange
+    Account acc = new Account(Name = 'Test');
+
+    // Act - no mock registered for 'unmockedInsert', should hit real DB
+    List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ acc }, 'unmockedInsert');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.isTrue(results[0].isSuccess());
+  }
+
+  @isTest
+  static void givenMockId_whenUpdateRecordsIsCalled_thenMockExecutes() {
+    // Arrange
+    DAL.mock('updateAccounts');
+    Account acc = new Account(Name = 'Test');
+    acc.Id = DatabaseTestUtils.getFakeId(Account.SObjectType);
+
+    // Act - should not throw, mock intercepts
+    DAL.updateRecords(new List<Account>{ acc }, 'updateAccounts');
+
+    // Assert - no exception means mock worked (real update of fake Id would fail)
+    Assert.isNotNull(acc.Id);
+  }
+
+  @isTest
+  static void givenMockId_whenDeleteRecordsIsCalled_thenMockExecutes() {
+    // Arrange
+    DAL.mock('deleteAccounts');
+    Account acc = new Account(Name = 'Test');
+    acc.Id = DatabaseTestUtils.getFakeId(Account.SObjectType);
+
+    // Act - should not throw, mock intercepts
+    DAL.deleteRecords(new List<Account>{ acc }, 'deleteAccounts');
+
+    // Assert - no exception means mock worked
+    Assert.isNotNull(acc.Id);
+  }
+
+  @isTest
+  static void givenMockId_whenUndeleteRecordsIsCalled_thenMockExecutes() {
+    // Arrange
+    DAL.mock('undeleteAccounts');
+    Account acc = new Account(Name = 'Test');
+    acc.Id = DatabaseTestUtils.getFakeId(Account.SObjectType);
+
+    // Act - should not throw, mock intercepts
+    DAL.undeleteRecords(new List<Account>{ acc }, 'undeleteAccounts');
+
+    // Assert - no exception means mock worked
+    Assert.isNotNull(acc.Id);
+  }
+
+  @isTest
+  static void givenMockId_whenThrowExceptionWithDefaultMessage_thenThrowsDmlException() {
+    // Arrange
+    DAL.mock('failingInsert').throwException();
+
+    // Act & Assert
+    try {
+      DAL.insertRecords(new List<Account>{ new Account(Name = 'Test') }, 'failingInsert');
+      Assert.fail('Expected DmlException');
+    } catch (DmlException e) {
+      Assert.isTrue(e.getMessage().contains('DML mock exception'));
+    }
+  }
+
+  @isTest
+  static void givenMockId_whenUpsertRecordsIsCalled_thenMockAssignsFakeIds() {
+    // Arrange
+    DAL.mock('upsertAccounts');
+    Account acc = new Account(Name = 'Test');
+
+    // Act
+    DAL.upsertRecords(new List<Account>{ acc }, 'upsertAccounts');
+
+    // Assert
+    Assert.isNotNull(acc.Id, 'Upsert mock should assign fake Id');
+  }
+
+  @isTest
+  static void givenMockId_whenInsertWithAccessLevel_thenMockIntercepts() {
+    // Arrange
+    DAL.mock('insertWithAccess');
+    Account acc = new Account(Name = 'Test');
+
+    // Act
+    DAL.insertRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE, 'insertWithAccess');
+
+    // Assert
+    Assert.isNotNull(acc.Id);
+  }
 }
