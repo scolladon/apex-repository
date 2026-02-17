@@ -447,4 +447,157 @@ private class DAL_TEST {
     // Assert
     Assert.isNotNull(acc.Id);
   }
+
+  // mockId-based Query/Find mocking tests
+
+  @isTest
+  static void givenMockQuery_whenQueryIsCalled_thenReturnsMockedRecords() {
+    // Arrange
+    List<Account> mockedAccounts = new List<Account>{ new Account(Name = 'Mocked Account') };
+    DAL.mockQuery('queryAccounts').thenReturn(mockedAccounts);
+
+    // Act
+    List<SObject> results = DAL.query('SELECT Id, Name FROM Account', new Map<String, Object>(), 'queryAccounts');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual('Mocked Account', ((Account) results[0]).Name);
+  }
+
+  @isTest
+  static void givenMockQuery_whenQueryWithAccessLevelIsCalled_thenReturnsMockedRecords() {
+    // Arrange
+    List<Account> mockedAccounts = new List<Account>{ new Account(Name = 'Mocked') };
+    DAL.mockQuery('queryAccessLevel').thenReturn(mockedAccounts);
+
+    // Act
+    List<SObject> results = DAL.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE, 'queryAccessLevel');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+  }
+
+  @isTest
+  static void givenMockQuery_whenInlineQueryIsCalled_thenReturnsMockedRecords() {
+    // Arrange
+    List<Account> mockedAccounts = new List<Account>{ new Account(Name = 'Inline Mock') };
+    DAL.mockQuery('inlineQuery').thenReturn(mockedAccounts);
+
+    // Act
+    List<SObject> results = DAL.query([SELECT Id FROM Account], 'inlineQuery');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual('Inline Mock', ((Account) results[0]).Name);
+  }
+
+  @isTest
+  static void givenMockQuery_whenQueryCountIsCalled_thenReturnsMockedCount() {
+    // Arrange
+    DAL.mockQuery('countAccounts').thenReturn(42);
+
+    // Act
+    Integer count = DAL.queryCount([SELECT COUNT() FROM Account], 'countAccounts');
+
+    // Assert
+    Assert.areEqual(42, count);
+  }
+
+  @isTest
+  static void givenMockQuery_whenQueryAggregateIsCalled_thenReturnsMockedAggregateProxies() {
+    // Arrange
+    AggregateResultProxy proxy = new AggregateResultProxy(
+      (AggregateResult) DatabaseTestUtils.makeData(AggregateResult.class, new Map<String, Object>{ 'countId' => 5 })
+    );
+    DAL.mockQuery('aggregateQuery').thenReturnAggregateProxy(new List<AggregateResultProxy>{ proxy });
+
+    // Act
+    List<AggregateResultProxy> results = DAL.queryAggregate([SELECT Count(Id) countId FROM Account], 'aggregateQuery');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual(5, results[0].get('countId'));
+  }
+
+  @isTest
+  static void givenMockQuery_whenFindIsCalled_thenReturnsMockedSearchResults() {
+    // Arrange
+    List<List<SObject>> mockedResults = new List<List<SObject>>{ new List<Account>{ new Account(Name = 'Found') } };
+    DAL.mockQuery('findAccounts').thenReturnSearch(mockedResults);
+
+    // Act
+    List<List<SObject>> results = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account', 'findAccounts');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual(1, results[0].size());
+    Assert.areEqual('Found', ((Account) results[0][0]).Name);
+  }
+
+  @isTest
+  static void givenMockQuery_whenFindWithAccessLevelIsCalled_thenReturnsMockedSearchResults() {
+    // Arrange
+    List<List<SObject>> mockedResults = new List<List<SObject>>{ new List<Account>{ new Account(Name = 'Found') } };
+    DAL.mockQuery('findAccessLevel').thenReturnSearch(mockedResults);
+
+    // Act
+    List<List<SObject>> results = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account', AccessLevel.SYSTEM_MODE, 'findAccessLevel');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+  }
+
+  @isTest
+  static void givenMockQuery_whenInlineFindIsCalled_thenReturnsMockedSearchResults() {
+    // Arrange
+    List<List<SObject>> mockedResults = new List<List<SObject>>{ new List<Account>{ new Account(Name = 'InlineFind') } };
+    DAL.mockQuery('inlineFind').thenReturnSearch(mockedResults);
+
+    // Act
+    List<List<SObject>> results = DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)], 'inlineFind');
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.areEqual('InlineFind', ((Account) results[0][0]).Name);
+  }
+
+  @isTest
+  static void givenMockQuery_whenThrowExceptionConfigured_thenThrowsQueryException() {
+    // Arrange
+    DAL.mockQuery('failingQuery').throwException('Custom query error');
+
+    // Act & Assert
+    try {
+      DAL.query('SELECT Id FROM Account', new Map<String, Object>(), 'failingQuery');
+      Assert.fail('Expected QueryException');
+    } catch (QueryException e) {
+      Assert.isTrue(e.getMessage().contains('Custom query error'));
+    }
+  }
+
+  @isTest
+  static void givenMockQuery_whenNoMockRegistered_thenDelegatesToInstance() {
+    // Act - no mock registered, should execute normally
+    List<SObject> results = DAL.query('SELECT Id FROM Account', new Map<String, Object>(), 'unmockedQuery');
+
+    // Assert
+    Assert.areEqual(0, results.size());
+  }
+
+  @isTest
+  static void givenMultipleMockQueries_whenCalledIndependently_thenEachReturnsDifferentResults() {
+    // Arrange
+    DAL.mockQuery('queryFirst').thenReturn(new List<Account>{ new Account(Name = 'First') });
+    DAL.mockQuery('querySecond').thenReturn(new List<Account>{ new Account(Name = 'Second'), new Account(Name = 'Third') });
+
+    // Act
+    List<SObject> firstResults = DAL.query('SELECT Id FROM Account', new Map<String, Object>(), 'queryFirst');
+    List<SObject> secondResults = DAL.query('SELECT Id FROM Account', new Map<String, Object>(), 'querySecond');
+
+    // Assert
+    Assert.areEqual(1, firstResults.size());
+    Assert.areEqual('First', ((Account) firstResults[0]).Name);
+    Assert.areEqual(2, secondResults.size());
+    Assert.areEqual('Second', ((Account) secondResults[0]).Name);
+  }
 }

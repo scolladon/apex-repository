@@ -42,6 +42,91 @@ public inherited sharing class DAL { // RepositoryService ACL
     return dmlMock;
   }
 
+  // Query/Find Mocking by mockId (similar to SOQL.mockId)
+  private static Map<String, QueryMock> queryIdToMock = new Map<String, QueryMock>();
+
+  @TestVisible
+  private static QueryMockable mockQuery(String mockId) {
+    final QueryMock queryMock = new QueryMock();
+    DAL.queryIdToMock.put(mockId, queryMock);
+    return queryMock;
+  }
+
+  @TestVisible
+  private interface QueryMockable {
+    QueryMockable thenReturn(List<SObject> records);
+    QueryMockable thenReturn(Integer count);
+    QueryMockable thenReturnAggregateProxy(List<AggregateResultProxy> aggregateResultProxies);
+    QueryMockable thenReturnSearch(List<List<SObject>> searchResults);
+    void throwException();
+    void throwException(String message);
+  }
+
+  @TestVisible
+  private class QueryMock implements QueryMockable {
+    private List<SObject> mockedRecords;
+    private Integer mockedCount;
+    private List<AggregateResultProxy> mockedAggregateProxies;
+    private List<List<SObject>> mockedSearchResults;
+    private QueryException mockException;
+
+    public QueryMockable thenReturn(List<SObject> records) {
+      this.mockedRecords = records;
+      return this;
+    }
+
+    public QueryMockable thenReturn(Integer count) {
+      this.mockedCount = count;
+      return this;
+    }
+
+    public QueryMockable thenReturnAggregateProxy(List<AggregateResultProxy> aggregateResultProxies) {
+      this.mockedAggregateProxies = aggregateResultProxies;
+      return this;
+    }
+
+    public QueryMockable thenReturnSearch(List<List<SObject>> searchResults) {
+      this.mockedSearchResults = searchResults;
+      return this;
+    }
+
+    public void throwException() {
+      this.throwException('Query mock exception');
+    }
+
+    public void throwException(String message) {
+      this.mockException = new QueryException(message);
+    }
+
+    public List<SObject> getRecords() {
+      if (this.mockException != null) {
+        throw this.mockException;
+      }
+      return this.mockedRecords != null ? this.mockedRecords : new List<SObject>();
+    }
+
+    public Integer getCount() {
+      if (this.mockException != null) {
+        throw this.mockException;
+      }
+      return this.mockedCount != null ? this.mockedCount : 0;
+    }
+
+    public List<AggregateResultProxy> getAggregateProxies() {
+      if (this.mockException != null) {
+        throw this.mockException;
+      }
+      return this.mockedAggregateProxies != null ? this.mockedAggregateProxies : new List<AggregateResultProxy>();
+    }
+
+    public List<List<SObject>> getSearchResults() {
+      if (this.mockException != null) {
+        throw this.mockException;
+      }
+      return this.mockedSearchResults != null ? this.mockedSearchResults : new List<List<SObject>>();
+    }
+  }
+
   @TestVisible
   private interface DmlMockable {
     void throwException();
@@ -466,6 +551,60 @@ public inherited sharing class DAL { // RepositoryService ACL
       return null;
     }
     return DAL.instance.undeleteRecordsPartially(records, accessLevel);
+  }
+
+  // Query/Find methods with mockId support (similar to SOQL.mockId)
+  // Query with mockId
+  public static List<SObject> query(final String soql, final Map<String, Object> bindMap, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getRecords();
+    }
+    return DAL.instance.query(soql, bindMap);
+  }
+  public static List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getRecords();
+    }
+    return DAL.instance.query(soql, bindMap, accessLevel);
+  }
+  public static List<SObject> query(final List<SObject> soql, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getRecords();
+    }
+    return DAL.instance.query(soql);
+  }
+  // QueryAggregate with mockId
+  public static List<AggregateResultProxy> queryAggregate(final List<AggregateResult> aggregateResults, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getAggregateProxies();
+    }
+    return DAL.instance.queryAggregate(aggregateResults);
+  }
+  // QueryCount with mockId
+  public static Integer queryCount(final Integer count, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getCount();
+    }
+    return DAL.instance.queryCount(count);
+  }
+  // Find with mockId
+  public static List<List<SObject>> find(final String sosl, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getSearchResults();
+    }
+    return DAL.instance.find(sosl);
+  }
+  public static List<List<SObject>> find(final String sosl, AccessLevel accessLevel, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getSearchResults();
+    }
+    return DAL.instance.find(sosl, accessLevel);
+  }
+  public static List<List<SObject>> find(final List<List<SObject>> sosl, final String mockId) {
+    if (DAL.queryIdToMock.containsKey(mockId)) {
+      return DAL.queryIdToMock.get(mockId).getSearchResults();
+    }
+    return DAL.instance.find(sosl);
   }
 
   private inherited sharing class DALImpl implements IDAL {
