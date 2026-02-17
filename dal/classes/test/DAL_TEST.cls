@@ -138,6 +138,11 @@ private class DAL_TEST {
     DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(List<List<Account>>.class));
 
+    // WARNING: These dynamic SOSL strings use escaped single quotes ('\''). If executed against the
+    // real org (not mocked), DAL.find() would call String.escapeSingleQuotes() on top of them,
+    // producing double-escaped backslashes and failing with: "no viable alternative at character '\'".
+    // They only pass here because the DAL is stubbed and the SOSL is never actually executed.
+    // If unmocked, the correct syntax would be: 'FIND {Test} IN NAME FIELDS RETURNING Account (Id, Name)'
     DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
     Expect.that(findSpy).hasBeenCalledWith(Argument.ofType(String.class));
 
@@ -160,18 +165,33 @@ private class DAL_TEST {
     Expect.that(insertSpy).hasNotBeenCalled();
   }
 
+  // FIX: This test was failing for two reasons:
+  // 1) The original code reused the same Account instance across all insert calls. After the first
+  //    successful insert, Salesforce assigns an Id to the record in-memory. Subsequent inserts of
+  //    the same instance then fail with: 'cannot specify Id in an insert call'.
+  // 2) Before the allOrNone bugfix, the non-partial insert methods were silently swallowing
+  //    this error because Database.DmlOptions().OptAllOrNone defaults to null (false), so
+  //    they behaved as partial inserts — returning a failed SaveResult instead of throwing.
+  //    The test only asserted results.size() == 1, which passed regardless of success/failure.
+  // Solution: use a separate Account instance for each insert call.
   @isTest
   static void givenDAL_whenInsertRecordsIsCalled_thenItTriesToInsertRecords() {
-    // Arrange
-    Account acc = new Account(Name = 'Test');
+    // Arrange - each call needs its own Account; after the first insert, the record gets an Id
+    // and a second insert would fail with 'cannot specify Id in an insert call'
+    Account acc1 = new Account(Name = 'Test1');
+    Account acc2 = new Account(Name = 'Test2');
+    Account acc3 = new Account(Name = 'Test3');
+    Account acc4 = new Account(Name = 'Test4');
+    Account acc5 = new Account(Name = 'Test5');
+    Account acc6 = new Account(Name = 'Test6');
 
     // Act
-    List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ acc });
-    List<Database.SaveResult> resultsOptions = DAL.insertRecords(new List<Account>{ acc }, new Database.DMLOptions());
-    List<Database.SaveResult> resultsPartially = DAL.insertRecordsPartially(new List<Account>{ acc });
-    List<Database.SaveResult> resultsWithMode = DAL.insertRecords(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsOptionsWithMode = DAL.insertRecords(new List<Account>{ acc }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
-    List<Database.SaveResult> resultsPartiallyWithMode = DAL.insertRecordsPartially(new List<Account>{ acc }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> results = DAL.insertRecords(new List<Account>{ acc1 });
+    List<Database.SaveResult> resultsOptions = DAL.insertRecords(new List<Account>{ acc2 }, new Database.DMLOptions());
+    List<Database.SaveResult> resultsPartially = DAL.insertRecordsPartially(new List<Account>{ acc3 });
+    List<Database.SaveResult> resultsWithMode = DAL.insertRecords(new List<Account>{ acc4 }, AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsOptionsWithMode = DAL.insertRecords(new List<Account>{ acc5 }, new Database.DMLOptions(), AccessLevel.SYSTEM_MODE);
+    List<Database.SaveResult> resultsPartiallyWithMode = DAL.insertRecordsPartially(new List<Account>{ acc6 }, AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(1, results.size());
@@ -182,10 +202,19 @@ private class DAL_TEST {
     Assert.areEqual(1, resultsPartiallyWithMode.size());
   }
 
+  // FIX: This test was failing because the original code created an Account without inserting it,
+  // so it had no Id. Calling Database.update on a record without an Id throws:
+  // 'MISSING_ARGUMENT, Id not specified in an update call'. Before the allOrNone bugfix, this
+  // error was silently swallowed (same partial-insert issue as above), and the test passed
+  // because it only checked results.size() == 1.
+  // Solution: insert the Account first so it gets a valid Id before updating.
   @isTest
   static void givenDAL_whenUpdateRecordsIsCalled_thenItTriesToUpdateRecords() {
-    // Arrange
+    // Arrange - insert first so the record has a valid Id for update
     Account acc = new Account(Name = 'Test');
+    insert acc;
+
+    acc.Name = 'Updated';
 
     // Act
     List<Database.SaveResult> results = DAL.updateRecords(new List<Account>{ acc });
@@ -297,17 +326,83 @@ private class DAL_TEST {
     Assert.areEqual(0, count);
   }
 
+  // FIX: This test was failing because the original dynamic SOSL strings used escaped single quotes:
+  //   'FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)'
+  // The DAL.find() implementation calls String.escapeSingleQuotes() on the input, which added
+  // extra backslashes to the already-escaped quotes, producing invalid SOSL:
+  //   FIND \\'Test\\' ... → "no viable alternative at character '\'"
+  // Solution: use SOSL curly-brace syntax {Test} instead of single-quoted 'Test' for dynamic strings.
+  // The inline SOSL (first call) was already fine since it's compiled, not string-escaped.
   @isTest
   static void givenDAL_whenFindIsCalled_thenItTriesToFindRecords() {
     // Act
     List<List<SObject>> resultsStatic = DAL.find([FIND 'Test' IN NAME FIELDS RETURNING Account(Id, Name)]);
-    List<List<SObject>> resultsDynamic = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)');
-    List<List<SObject>> resultsDynamicWithMode = DAL.find('FIND \'Test\' IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
+    List<List<SObject>> resultsDynamic = DAL.find('FIND {Test} IN NAME FIELDS RETURNING Account (Id, Name)');
+    List<List<SObject>> resultsDynamicWithMode = DAL.find('FIND {Test} IN NAME FIELDS RETURNING Account (Id, Name)', AccessLevel.SYSTEM_MODE);
 
     // Assert
     Assert.areEqual(0, resultsStatic[0].size());
     Assert.areEqual(0, resultsDynamic[0].size());
     Assert.areEqual(0, resultsDynamicWithMode[0].size());
+  }
+
+  // Regression tests: non-partial DML must throw on failure (allOrNone = true)
+
+  @isTest
+  static void givenNonPartialInsert_whenRecordIsInvalid_thenThrowsDmlException() {
+    // Arrange - Account without required Name field on an org where Name is required
+    // Using a record that will definitely fail: inserting a Contact without LastName
+    Contact invalidContact = new Contact(); // LastName is required
+
+    // Act & Assert
+    try {
+      DAL.insertRecords(new List<Contact>{ invalidContact });
+      Assert.fail('Expected DmlException for non-partial insert of invalid record');
+    } catch (DmlException e) {
+      Assert.isTrue(e.getMessage().contains('REQUIRED_FIELD_MISSING') || e.getMessage().contains('LastName'));
+    }
+  }
+
+  @isTest
+  static void givenPartialInsert_whenRecordIsInvalid_thenDoesNotThrow() {
+    // Arrange
+    Contact invalidContact = new Contact(); // LastName is required
+
+    // Act - partial insert should NOT throw
+    List<Database.SaveResult> results = DAL.insertRecordsPartially(new List<Contact>{ invalidContact });
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.isFalse(results[0].isSuccess(), 'Partial insert should return failure result, not throw');
+  }
+
+  @isTest
+  static void givenNonPartialUpdate_whenRecordIsInvalid_thenThrowsDmlException() {
+    // Arrange - Update a record with a fake Id that doesn't exist
+    Account acc = new Account(Name = 'Test');
+    acc.Id = DatabaseTestUtils.getFakeId(Account.SObjectType);
+
+    // Act & Assert
+    try {
+      DAL.updateRecords(new List<Account>{ acc });
+      Assert.fail('Expected DmlException for non-partial update of non-existent record');
+    } catch (DmlException e) {
+      Assert.isNotNull(e.getMessage());
+    }
+  }
+
+  @isTest
+  static void givenPartialUpdate_whenRecordIsInvalid_thenDoesNotThrow() {
+    // Arrange
+    Account acc = new Account(Name = 'Test');
+    acc.Id = DatabaseTestUtils.getFakeId(Account.SObjectType);
+
+    // Act - partial update should NOT throw
+    List<Database.SaveResult> results = DAL.updateRecordsPartially(new List<Account>{ acc });
+
+    // Assert
+    Assert.areEqual(1, results.size());
+    Assert.isFalse(results[0].isSuccess(), 'Partial update should return failure result, not throw');
   }
 
   // mockId-based DML mocking tests
@@ -503,12 +598,17 @@ private class DAL_TEST {
     Assert.areEqual(42, count);
   }
 
+  // FIX: This test was failing because the original code built the AggregateResultProxy via:
+  //   new AggregateResultProxy((AggregateResult) DatabaseTestUtils.makeData(AggregateResult.class, ...))
+  // DatabaseTestUtils.makeData uses JSON.serialize/deserialize to create the AggregateResult.
+  // However, AggregateResult.getPopulatedFieldsAsMap() (used by the public constructor) does not
+  // return fields populated through deserialization — it returns an empty map, so proxy.get('countId')
+  // returned null instead of 5.
+  // Solution: use the @TestVisible private constructor that accepts a Map<String, Object> directly.
   @isTest
   static void givenMockQuery_whenQueryAggregateIsCalled_thenReturnsMockedAggregateProxies() {
     // Arrange
-    AggregateResultProxy proxy = new AggregateResultProxy(
-      (AggregateResult) DatabaseTestUtils.makeData(AggregateResult.class, new Map<String, Object>{ 'countId' => 5 })
-    );
+    AggregateResultProxy proxy = new AggregateResultProxy(new Map<String, Object>{ 'countId' => 5 });
     DAL.mockQuery('aggregateQuery').thenReturnAggregateProxy(new List<AggregateResultProxy>{ proxy });
 
     // Act
@@ -519,6 +619,10 @@ private class DAL_TEST {
     Assert.areEqual(5, results[0].get('countId'));
   }
 
+  // NOTE: The dynamic SOSL string below uses escaped single quotes ('\''). This only works
+  // because the mockId intercepts the call before DAL.find() reaches String.escapeSingleQuotes().
+  // If no mock were registered, it would fail with: "no viable alternative at character '\'".
+  // The correct unmocked syntax would be: 'FIND {Test} IN NAME FIELDS RETURNING Account'
   @isTest
   static void givenMockQuery_whenFindIsCalled_thenReturnsMockedSearchResults() {
     // Arrange
@@ -534,6 +638,8 @@ private class DAL_TEST {
     Assert.areEqual('Found', ((Account) results[0][0]).Name);
   }
 
+  // NOTE: Same single-quote issue as above — only works because the mockId intercepts the call.
+  // See givenMockQuery_whenFindIsCalled_thenReturnsMockedSearchResults for details.
   @isTest
   static void givenMockQuery_whenFindWithAccessLevelIsCalled_thenReturnsMockedSearchResults() {
     // Arrange
