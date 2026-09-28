@@ -2,8 +2,12 @@
 public class DatabaseTestUtils {
   static Integer identifier = 1;
   public static String getFakeId(Schema.SObjectType sot) {
+    final String keyPrefix = sot.getDescribe().getKeyPrefix();
+    if (keyPrefix == null) {
+      throw new IllegalArgumentException(sot + ' has no key prefix, no Id can be forged for it');
+    }
     String result = String.valueOf(identifier++);
-    return sot.getDescribe().getKeyPrefix() + '0'.repeat(12 - result.length()) + result;
+    return keyPrefix + '0'.repeat(12 - result.length()) + result;
   }
 
   public static Object makeData(final Type sobjectType, final Map<String, Object> data) {

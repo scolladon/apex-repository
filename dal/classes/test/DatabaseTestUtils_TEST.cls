@@ -29,6 +29,17 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
+  static void givenSObjectTypeWithoutKeyPrefix_whenGetFakeId_thenThrowsIllegalArgument() {
+    // Act & Assert
+    try {
+      DatabaseTestUtils.getFakeId(AggregateResult.SObjectType);
+      Assert.fail('an aggregate has no key prefix, no Id can be forged for it');
+    } catch (IllegalArgumentException e) {
+      Assert.isTrue(e.getMessage().contains('AggregateResult'));
+    }
+  }
+
+  @IsTest
   static void givenTypedValues_whenMakeData_thenEachFieldKeepsItsType() {
     // Arrange
     final Date closeDate = Date.newInstance(2026, 1, 31);
