@@ -35,7 +35,7 @@ private class DatabaseTestUtils_TEST {
       DatabaseTestUtils.getFakeId(AggregateResult.SObjectType);
       Assert.fail('an aggregate has no key prefix, no Id can be forged for it');
     } catch (IllegalArgumentException e) {
-      Assert.isTrue(e.getMessage().contains('AggregateResult'));
+      Assert.areEqual('AggregateResult has no key prefix, no Id can be forged for it', e.getMessage());
     }
   }
 
