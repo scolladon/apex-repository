@@ -7,24 +7,35 @@ public class DatabaseTestUtils {
   }
 
   public static Object makeData(final Type sobjectType, final Map<String, Object> data) {
-    Map<String, Object> dataResult = new Map<String, Object>();
-    for (String fieldName : data.keySet()) {
-      Object fieldValue = data.get(fieldName); // Lookup | Primitive
-      if (fieldValue instanceof List<SObject>) {
-        // ChildRelationShip
-        final List<Map<String, Object>> children = new List<Map<String, Object>>();
-        for (Object child : (List<Object>) fieldValue) {
-          if (child instanceof Map<String, Object>) {
-            children.add((Map<String, Object>) child);
-          } else {
-            children.add((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(child)));
-          }
-        }
-        fieldValue = new Map<String, Object>{ 'totalSize' => children.size(), 'done' => true, 'records' => children };
-      }
-      dataResult.put(fieldName, fieldValue);
+    final JSONGenerator generator = JSON.createGenerator(false);
+    generator.writeStartObject();
+    final List<String> fieldNames = new List<String>(data.keySet());
+    // Reverse order mirrors JSON.serialize(Map): order-sensitive platform types (Database.SaveResult lets a later "errors" override an earlier "success") must keep behaving the same
+    for (Integer i = fieldNames.size() - 1; i >= 0; i--) {
+      writeField(generator, fieldNames[i], data.get(fieldNames[i]));
     }
+    generator.writeEndObject();
+    return JSON.deserialize(generator.getAsString(), sobjectType);
+  }
 
-    return JSON.deserialize(JSON.serialize(dataResult), sobjectType);
+  private static void writeField(final JSONGenerator generator, final String fieldName, final Object fieldValue) {
+    generator.writeFieldName(fieldName);
+    if (fieldValue == null) {
+      generator.writeNull();
+    } else if (fieldValue instanceof List<SObject>) {
+      writeChildRelationship(generator, (List<SObject>) fieldValue);
+    } else {
+      generator.writeObject(fieldValue); // Lookup | Primitive
+    }
+  }
+
+  // QueryResult wire format, the only shape the SObject deserializer accepts for a child relationship
+  private static void writeChildRelationship(final JSONGenerator generator, final List<SObject> children) {
+    generator.writeStartObject();
+    generator.writeNumberField('totalSize', children.size());
+    generator.writeBooleanField('done', true);
+    generator.writeFieldName('records');
+    generator.writeObject(children);
+    generator.writeEndObject();
   }
 }

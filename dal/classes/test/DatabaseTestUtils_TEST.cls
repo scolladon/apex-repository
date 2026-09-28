@@ -39,6 +39,20 @@ private class DatabaseTestUtils_TEST {
   }
 
   @isTest
+  static void makeData_SObject_withNullValue() {
+    // Arrange
+    final Map<String, Object> values = new Map<String, Object>{ 'Name' => null, 'Industry' => 'Tech' };
+
+    // Act
+    Account acc = (Account) DatabaseTestUtils.makeData(Account.class, values);
+
+    // Assert
+    Assert.isNotNull(acc);
+    Assert.isNull(acc.Name);
+    Assert.areEqual('Tech', acc.Industry);
+  }
+
+  @isTest
   static void makeData_SObject_withReadOnlyField() {
     // Arrange
     final Map<String, Object> values = new Map<String, Object>{ 'IsClosed' => true };
