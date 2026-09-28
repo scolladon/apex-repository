@@ -1,13 +1,24 @@
 @IsTest
 public class DatabaseTestUtils {
-  static Integer identifier = 1;
-  public static String getFakeId(Schema.SObjectType sot) {
-    final String keyPrefix = sot.getDescribe().getKeyPrefix();
+  private static final Integer ID_NUMERIC_LENGTH = 12;
+  private static final Map<Schema.SObjectType, String> keyPrefixes = new Map<Schema.SObjectType, String>();
+  private static Integer identifier = 0;
+
+  public static String getFakeId(final Schema.SObjectType sot) {
+    String keyPrefix = keyPrefixes.get(sot);
+    if (keyPrefix == null) {
+      keyPrefix = describeKeyPrefix(sot);
+      keyPrefixes.put(sot, keyPrefix);
+    }
+    return keyPrefix + String.valueOf(++identifier).leftPad(ID_NUMERIC_LENGTH, '0');
+  }
+
+  private static String describeKeyPrefix(final Schema.SObjectType sot) {
+    final String keyPrefix = sot.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
     if (keyPrefix == null) {
       throw new IllegalArgumentException(sot + ' has no key prefix, no Id can be forged for it');
     }
-    String result = String.valueOf(identifier++);
-    return keyPrefix + '0'.repeat(12 - result.length()) + result;
+    return keyPrefix;
   }
 
   public static Object makeData(final Type sobjectType, final Map<String, Object> data) {
