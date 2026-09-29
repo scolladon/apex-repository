@@ -20,7 +20,7 @@ This library depends on [Apex-Mockery](https://github.com/link-to-apex-mockery).
 2. Deploy the following files to your org:
    - `IDAL.cls`
    - `DAL.cls`
-   - `DatabaseTestUtils.cls` (optional - for testing utilities)
+   - `Fabricator.cls` (test data builder, required: `DAL.cls` references it)
 
 ## Usage
 
@@ -58,11 +58,11 @@ static void testAccountCreation() {
     MethodSpy insertSpy = dalStub.spyOnInsert();
 
     Account testAccount = new Account(Name = 'Test');
-    Database.SaveResult mockResult = (Database.SaveResult)DatabaseTestUtils.makeData(
+    Database.SaveResult mockResult = (Database.SaveResult)Fabricator.make(
         Database.SaveResult.class,
         new Map<String, Object>{
             'success' => true,
-            'id' => DatabaseTestUtils.getFakeId(Account.SObjectType)
+            'id' => Fabricator.nextId(Account.SObjectType)
         }
     );
     insertSpy.returns(new List<Database.SaveResult>{ mockResult });
