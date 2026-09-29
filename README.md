@@ -76,6 +76,10 @@ static void testAccountCreation() {
 }
 ````
 
+## Test data: Fabricator
+
+`Fabricator` builds in-memory records with read-only fields, nested parents and children, platform results (`Database.SaveResult`…) and DTOs, without DML or SOQL. See [docs/Fabricator.md](docs/Fabricator.md).
+
 ## Advanced Feature
 
 **System Mode Operations**
