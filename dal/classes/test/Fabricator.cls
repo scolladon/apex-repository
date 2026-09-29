@@ -1,16 +1,16 @@
 @IsTest
-public class DatabaseTestUtils {
+public class Fabricator {
   private static final Integer ID_NUMERIC_LENGTH = 12;
   private static final Map<Schema.SObjectType, String> keyPrefixes = new Map<Schema.SObjectType, String>();
   private static Integer identifier = 0;
 
-  public static String getFakeId(final Schema.SObjectType sot) {
+  public static Id nextId(final Schema.SObjectType sot) {
     String keyPrefix = keyPrefixes.get(sot);
     if (keyPrefix == null) {
       keyPrefix = describeKeyPrefix(sot);
       keyPrefixes.put(sot, keyPrefix);
     }
-    return keyPrefix + String.valueOf(++identifier).leftPad(ID_NUMERIC_LENGTH, '0');
+    return Id.valueOf(keyPrefix + String.valueOf(++identifier).leftPad(ID_NUMERIC_LENGTH, '0'));
   }
 
   private static String describeKeyPrefix(final Schema.SObjectType sot) {
@@ -21,7 +21,7 @@ public class DatabaseTestUtils {
     return keyPrefix;
   }
 
-  public static Object makeData(final Type sobjectType, final Map<String, Object> data) {
+  public static Object make(final Type targetType, final Map<String, Object> data) {
     final JSONGenerator generator = JSON.createGenerator(false);
     generator.writeStartObject();
     final List<String> fieldNames = new List<String>(data.keySet());
@@ -39,7 +39,7 @@ public class DatabaseTestUtils {
       }
     }
     generator.writeEndObject();
-    return JSON.deserialize(generator.getAsString(), sobjectType);
+    return JSON.deserialize(generator.getAsString(), targetType);
   }
 
   // QueryResult wire format, the only shape the SObject deserializer accepts for a child relationship

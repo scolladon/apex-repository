@@ -26,7 +26,7 @@ public inherited sharing class DAL { // RepositoryService ACL
   private class InsertMock implements MethodSpy.SpyBehavior {
     public Object execute(final List<Object> params) {
       for (SObject sob : (List<SObject>) params[0]) {
-        sob.Id = DatabaseTestUtils.getFakeId(sob.getSObjectType());
+        sob.Id = Fabricator.nextId(sob.getSObjectType());
       }
       return null;
     }

@@ -1,38 +1,38 @@
 @IsTest
-private class DatabaseTestUtils_TEST {
-  private static final Integer FAKE_ID_LENGTH = 15;
+private class Fabricator_TEST {
+  private static final Integer CASE_SAFE_ID_LENGTH = 18;
   private static final Integer CHILDREN_VOLUME = 1000;
   private static final Integer COMPOSITION_DEPTH = 10;
 
   @IsTest
-  static void givenSObjectType_whenGetFakeId_thenReturnsValidIdOfThatType() {
+  static void givenSObjectType_whenNextId_thenReturnsCaseSafeIdOfThatType() {
     // Act
-    String fakeId = DatabaseTestUtils.getFakeId(Account.SObjectType);
+    Object forgedId = Fabricator.nextId(Account.SObjectType);
 
     // Assert
-    Assert.areEqual(FAKE_ID_LENGTH, fakeId.length());
-    Assert.areEqual(Account.SObjectType.getDescribe().getKeyPrefix() + '000000000001', fakeId);
-    Assert.areEqual(Account.SObjectType, Id.valueOf(fakeId).getSObjectType());
+    Assert.areEqual(CASE_SAFE_ID_LENGTH, String.valueOf(forgedId).length());
+    Assert.areEqual(Id.valueOf(Account.SObjectType.getDescribe().getKeyPrefix() + '000000000001'), forgedId);
+    Assert.areEqual(Account.SObjectType, ((Id) forgedId).getSObjectType());
   }
 
   @IsTest
-  static void givenSeveralCalls_whenGetFakeId_thenIdsAreUniqueAndIncreasing() {
+  static void givenSeveralCalls_whenNextId_thenIdsAreUniqueAndIncreasing() {
     // Act
-    String first = DatabaseTestUtils.getFakeId(Account.SObjectType);
-    String second = DatabaseTestUtils.getFakeId(Account.SObjectType);
-    String otherType = DatabaseTestUtils.getFakeId(Contact.SObjectType);
+    Id first = Fabricator.nextId(Account.SObjectType);
+    Id second = Fabricator.nextId(Account.SObjectType);
+    Id otherType = Fabricator.nextId(Contact.SObjectType);
 
     // Assert
-    Assert.isTrue(second.compareTo(first) > 0);
-    Assert.areEqual(3, new Set<String>{ first, second, otherType }.size());
-    Assert.areEqual(Contact.SObjectType, Id.valueOf(otherType).getSObjectType());
+    Assert.isTrue(String.valueOf(second).compareTo(String.valueOf(first)) > 0);
+    Assert.areEqual(3, new Set<Id>{ first, second, otherType }.size());
+    Assert.areEqual(Contact.SObjectType, otherType.getSObjectType());
   }
 
   @IsTest
-  static void givenSObjectTypeWithoutKeyPrefix_whenGetFakeId_thenThrowsIllegalArgument() {
+  static void givenSObjectTypeWithoutKeyPrefix_whenNextId_thenThrowsIllegalArgument() {
     // Act & Assert
     try {
-      DatabaseTestUtils.getFakeId(AggregateResult.SObjectType);
+      Fabricator.nextId(AggregateResult.SObjectType);
       Assert.fail('an aggregate has no key prefix, no Id can be forged for it');
     } catch (IllegalArgumentException e) {
       Assert.areEqual('AggregateResult has no key prefix, no Id can be forged for it', e.getMessage());
@@ -40,13 +40,13 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenTypedValues_whenMakeData_thenEachFieldKeepsItsType() {
+  static void givenTypedValues_whenMake_thenEachFieldKeepsItsType() {
     // Arrange
     final Date closeDate = Date.newInstance(2026, 1, 31);
     final Map<String, Object> values = new Map<String, Object>{ 'Name' => 'Oppy', 'CloseDate' => closeDate, 'Amount' => 1234.56, 'IsPrivate' => true };
 
     // Act
-    Opportunity opportunity = (Opportunity) DatabaseTestUtils.makeData(Opportunity.class, values);
+    Opportunity opportunity = (Opportunity) Fabricator.make(Opportunity.class, values);
 
     // Assert
     Assert.areEqual('Oppy', opportunity.Name);
@@ -56,28 +56,28 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenDatetimeValue_whenMakeData_thenInstantIsPreserved() {
+  static void givenDatetimeValue_whenMake_thenInstantIsPreserved() {
     // Arrange
     final Datetime startsAt = Datetime.newInstance(2026, 1, 31, 10, 30, 0);
 
     // Act
-    Event event = (Event) DatabaseTestUtils.makeData(Event.class, new Map<String, Object>{ 'ActivityDateTime' => startsAt });
+    Event event = (Event) Fabricator.make(Event.class, new Map<String, Object>{ 'ActivityDateTime' => startsAt });
 
     // Assert
     Assert.areEqual(startsAt, event.ActivityDateTime);
   }
 
   @IsTest
-  static void givenReadOnlyField_whenMakeData_thenFieldIsSet() {
+  static void givenReadOnlyField_whenMake_thenFieldIsSet() {
     // Act
-    Opportunity opportunity = (Opportunity) DatabaseTestUtils.makeData(Opportunity.class, new Map<String, Object>{ 'IsClosed' => true });
+    Opportunity opportunity = (Opportunity) Fabricator.make(Opportunity.class, new Map<String, Object>{ 'IsClosed' => true });
 
     // Assert
     Assert.isTrue(opportunity.IsClosed);
   }
 
   @IsTest
-  static void givenUnknownField_whenMakeData_thenFieldIsIgnored() {
+  static void givenUnknownField_whenMake_thenFieldIsIgnored() {
     // Act
     Account account = makeAccount(new Map<String, Object>{ 'Name' => 'Account', 'NoSuchField__c' => 'ignored' });
 
@@ -87,7 +87,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenNullValue_whenMakeData_thenFieldIsNull() {
+  static void givenNullValue_whenMake_thenFieldIsNull() {
     // Act
     Account account = makeAccount(new Map<String, Object>{ 'Name' => null, 'Industry' => 'Tech' });
 
@@ -97,7 +97,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenNoValue_whenMakeData_thenReturnsEmptyRecord() {
+  static void givenNoValue_whenMake_thenReturnsEmptyRecord() {
     // Act
     Account account = makeAccount(new Map<String, Object>());
 
@@ -107,7 +107,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenValueOfWrongType_whenMakeData_thenThrowsJSONException() {
+  static void givenValueOfWrongType_whenMake_thenThrowsJSONException() {
     // Arrange
     final Map<String, Object> values = new Map<String, Object>{ 'AnnualRevenue' => 'not a number' };
 
@@ -121,19 +121,19 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenFakeId_whenMakeData_thenIdIsSet() {
+  static void givenForgedId_whenMake_thenIdIsSet() {
     // Arrange
-    final Id fakeId = DatabaseTestUtils.getFakeId(Account.SObjectType);
+    final Id forgedId = Fabricator.nextId(Account.SObjectType);
 
     // Act
-    Account account = makeAccount(new Map<String, Object>{ 'Id' => fakeId, 'Name' => 'Account' });
+    Account account = makeAccount(new Map<String, Object>{ 'Id' => forgedId, 'Name' => 'Account' });
 
     // Assert
-    Assert.areEqual(fakeId, account.Id);
+    Assert.areEqual(forgedId, account.Id);
   }
 
   @IsTest
-  static void givenParentRelationships_whenMakeData_thenParentChainIsSet() {
+  static void givenParentRelationships_whenMake_thenParentChainIsSet() {
     // Arrange
     final Account parent = new Account(Name = 'Parent', Parent = new Account(Name = 'GrandParent'));
 
@@ -146,7 +146,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenChildRelationship_whenMakeData_thenAllChildrenAreSetInOrder() {
+  static void givenChildRelationship_whenMake_thenAllChildrenAreSetInOrder() {
     // Arrange
     final List<Opportunity> opportunities = new List<Opportunity>{ new Opportunity(Name = 'First'), new Opportunity(Name = 'Second'), new Opportunity(Name = 'Third') };
 
@@ -160,7 +160,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenSeveralChildRelationships_whenMakeData_thenEachOneIsSet() {
+  static void givenSeveralChildRelationships_whenMake_thenEachOneIsSet() {
     // Arrange
     final Map<String, Object> values = new Map<String, Object>{
       'Contacts' => new List<Contact>{ new Contact(LastName = 'Doe') },
@@ -176,10 +176,10 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenChildrenWithTheirOwnChildrenAndParents_whenMakeData_thenWholeGraphIsReachable() {
+  static void givenChildrenWithTheirOwnChildrenAndParents_whenMake_thenWholeGraphIsReachable() {
     // Arrange
-    Contract contract = (Contract) DatabaseTestUtils.makeData(Contract.class, new Map<String, Object>{ 'ContractNumber' => 'C-1', 'Account' => new Account(Name = 'Signer') });
-    Contact contact = (Contact) DatabaseTestUtils.makeData(
+    Contract contract = (Contract) Fabricator.make(Contract.class, new Map<String, Object>{ 'ContractNumber' => 'C-1', 'Account' => new Account(Name = 'Signer') });
+    Contact contact = (Contact) Fabricator.make(
       Contact.class,
       new Map<String, Object>{ 'Name' => 'Contact', 'Account' => new Account(Name = 'Employer'), 'ContractsSigned' => new List<Contract>{ contract } }
     );
@@ -195,7 +195,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenDeepComposition_whenMakeData_thenEveryLevelIsReachable() {
+  static void givenDeepComposition_whenMake_thenEveryLevelIsReachable() {
     // Arrange
     Account subtree = makeAccount(new Map<String, Object>{ 'Name' => 'Level' + COMPOSITION_DEPTH });
     for (Integer level = COMPOSITION_DEPTH - 1; level > 1; --level) {
@@ -214,7 +214,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenManyChildren_whenMakeData_thenAllOfThemAreSet() {
+  static void givenManyChildren_whenMake_thenAllOfThemAreSet() {
     // Arrange
     final List<Opportunity> opportunities = new List<Opportunity>();
     for (Integer i = 0; i < CHILDREN_VOLUME; ++i) {
@@ -232,7 +232,7 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenFailedSaveResultValues_whenMakeData_thenErrorsAreReadable() {
+  static void givenFailedSaveResultValues_whenMake_thenErrorsAreReadable() {
     // Arrange
     final Map<String, Object> values = new Map<String, Object>{
       'success' => false,
@@ -240,7 +240,7 @@ private class DatabaseTestUtils_TEST {
     };
 
     // Act
-    Database.SaveResult result = (Database.SaveResult) DatabaseTestUtils.makeData(Database.SaveResult.class, values);
+    Database.SaveResult result = (Database.SaveResult) Fabricator.make(Database.SaveResult.class, values);
 
     // Assert
     Assert.isFalse(result.isSuccess());
@@ -249,9 +249,9 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenSuccessInsertedBeforeErrors_whenMakeData_thenSuccessIsKept() {
+  static void givenSuccessInsertedBeforeErrors_whenMake_thenSuccessIsKept() {
     // Arrange
-    final Id recordId = DatabaseTestUtils.getFakeId(Account.SObjectType);
+    final Id recordId = Fabricator.nextId(Account.SObjectType);
     // Database result deserializers let a later "errors" override "success": fields are emitted in reverse insertion order so this natural ordering stays a success
     final Map<String, Object> values = new Map<String, Object>{
       'success' => true,
@@ -260,7 +260,7 @@ private class DatabaseTestUtils_TEST {
     };
 
     // Act
-    Database.SaveResult result = (Database.SaveResult) DatabaseTestUtils.makeData(Database.SaveResult.class, values);
+    Database.SaveResult result = (Database.SaveResult) Fabricator.make(Database.SaveResult.class, values);
 
     // Assert
     Assert.isTrue(result.isSuccess());
@@ -269,16 +269,16 @@ private class DatabaseTestUtils_TEST {
   }
 
   @IsTest
-  static void givenOtherDatabaseResultTypes_whenMakeData_thenTheyAreReadable() {
+  static void givenOtherDatabaseResultTypes_whenMake_thenTheyAreReadable() {
     // Arrange
-    final Id recordId = DatabaseTestUtils.getFakeId(Account.SObjectType);
+    final Id recordId = Fabricator.nextId(Account.SObjectType);
     final Map<String, Object> succeeded = new Map<String, Object>{ 'success' => true, 'id' => recordId, 'errors' => new List<Object>() };
     final Map<String, Object> created = new Map<String, Object>{ 'success' => true, 'created' => true, 'id' => recordId, 'errors' => new List<Object>() };
 
     // Act
-    Database.UpsertResult upserted = (Database.UpsertResult) DatabaseTestUtils.makeData(Database.UpsertResult.class, created);
-    Database.DeleteResult deleted = (Database.DeleteResult) DatabaseTestUtils.makeData(Database.DeleteResult.class, succeeded);
-    Database.UndeleteResult undeleted = (Database.UndeleteResult) DatabaseTestUtils.makeData(Database.UndeleteResult.class, succeeded);
+    Database.UpsertResult upserted = (Database.UpsertResult) Fabricator.make(Database.UpsertResult.class, created);
+    Database.DeleteResult deleted = (Database.DeleteResult) Fabricator.make(Database.DeleteResult.class, succeeded);
+    Database.UndeleteResult undeleted = (Database.UndeleteResult) Fabricator.make(Database.UndeleteResult.class, succeeded);
 
     // Assert
     Assert.isTrue(upserted.isSuccess());
@@ -291,6 +291,6 @@ private class DatabaseTestUtils_TEST {
   }
 
   private static Account makeAccount(final Map<String, Object> values) {
-    return (Account) DatabaseTestUtils.makeData(Account.class, values);
+    return (Account) Fabricator.make(Account.class, values);
   }
 }
