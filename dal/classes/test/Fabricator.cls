@@ -4,13 +4,13 @@ public class Fabricator {
   private static final Map<Schema.SObjectType, String> keyPrefixes = new Map<Schema.SObjectType, String>();
   private static Integer identifier = 0;
 
-  public static String nextId(final Schema.SObjectType sot) {
+  public static Id nextId(final Schema.SObjectType sot) {
     String keyPrefix = keyPrefixes.get(sot);
     if (keyPrefix == null) {
       keyPrefix = describeKeyPrefix(sot);
       keyPrefixes.put(sot, keyPrefix);
     }
-    return keyPrefix + String.valueOf(++identifier).leftPad(ID_NUMERIC_LENGTH, '0');
+    return Id.valueOf(keyPrefix + String.valueOf(++identifier).leftPad(ID_NUMERIC_LENGTH, '0'));
   }
 
   private static String describeKeyPrefix(final Schema.SObjectType sot) {

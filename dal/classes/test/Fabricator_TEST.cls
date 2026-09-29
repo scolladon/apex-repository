@@ -1,31 +1,31 @@
 @IsTest
 private class Fabricator_TEST {
-  private static final Integer ID_LENGTH = 15;
+  private static final Integer CASE_SAFE_ID_LENGTH = 18;
   private static final Integer CHILDREN_VOLUME = 1000;
   private static final Integer COMPOSITION_DEPTH = 10;
 
   @IsTest
-  static void givenSObjectType_whenNextId_thenReturnsValidIdOfThatType() {
+  static void givenSObjectType_whenNextId_thenReturnsCaseSafeIdOfThatType() {
     // Act
-    String forgedId = Fabricator.nextId(Account.SObjectType);
+    Object forgedId = Fabricator.nextId(Account.SObjectType);
 
     // Assert
-    Assert.areEqual(ID_LENGTH, forgedId.length());
-    Assert.areEqual(Account.SObjectType.getDescribe().getKeyPrefix() + '000000000001', forgedId);
-    Assert.areEqual(Account.SObjectType, Id.valueOf(forgedId).getSObjectType());
+    Assert.areEqual(CASE_SAFE_ID_LENGTH, String.valueOf(forgedId).length());
+    Assert.areEqual(Id.valueOf(Account.SObjectType.getDescribe().getKeyPrefix() + '000000000001'), forgedId);
+    Assert.areEqual(Account.SObjectType, ((Id) forgedId).getSObjectType());
   }
 
   @IsTest
   static void givenSeveralCalls_whenNextId_thenIdsAreUniqueAndIncreasing() {
     // Act
-    String first = Fabricator.nextId(Account.SObjectType);
-    String second = Fabricator.nextId(Account.SObjectType);
-    String otherType = Fabricator.nextId(Contact.SObjectType);
+    Id first = Fabricator.nextId(Account.SObjectType);
+    Id second = Fabricator.nextId(Account.SObjectType);
+    Id otherType = Fabricator.nextId(Contact.SObjectType);
 
     // Assert
-    Assert.isTrue(second.compareTo(first) > 0);
-    Assert.areEqual(3, new Set<String>{ first, second, otherType }.size());
-    Assert.areEqual(Contact.SObjectType, Id.valueOf(otherType).getSObjectType());
+    Assert.isTrue(String.valueOf(second).compareTo(String.valueOf(first)) > 0);
+    Assert.areEqual(3, new Set<Id>{ first, second, otherType }.size());
+    Assert.areEqual(Contact.SObjectType, otherType.getSObjectType());
   }
 
   @IsTest
