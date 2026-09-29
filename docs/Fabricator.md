@@ -11,12 +11,12 @@ Id     Fabricator.nextId(Schema.SObjectType sot)
 
 Apex refuses to build what the platform builds all the time:
 
-| You need                                     | Plain Apex                         | Fabricator |
+| You need                                     | Without Fabricator                 | Fabricator |
 | -------------------------------------------- | ---------------------------------- | ---------- |
 | `Opportunity.IsClosed`, formula, audit field | `Field is not writeable`           | ✅         |
 | `account.Contacts = contacts`                | `Field is not writeable`           | ✅         |
 | `Database.SaveResult` in a failed state      | no public constructor              | ✅         |
-| An Id for an unsaved record                  | DML insert                         | ✅         |
+| Unique Ids of the right type, without DML    | hand-written strings               | ✅         |
 | Relationships deeper than 5 levels           | SOQL caps parent-child at 5 levels | ✅         |
 
 Pair it with `DAL.mock()`: the unit under test gets exactly the records and results it would receive from the database, without ever touching it.
@@ -124,11 +124,11 @@ Invoice invoice = (Invoice) Fabricator.make(Invoice.class, new Map<String, Objec
 `nextId` returns the next Id of a per-transaction sequence: key prefix + 12-digit counter.
 
 ```apex
-Fabricator.nextId(Account.SObjectType); // 001000000000001
-Fabricator.nextId(Contact.SObjectType); // 003000000000002
+Fabricator.nextId(Account.SObjectType); // 001000000000001AAA
+Fabricator.nextId(Contact.SObjectType); // 003000000000002AAA
 ```
 
-- Valid `Id`: `Id.getSObjectType()` works.
+- Typed, case-safe `Id`: `getSObjectType()` works.
 - Unique within the transaction, across all types.
 - Never persisted: querying it returns nothing.
 - Throws `IllegalArgumentException` for types without key prefix (`AggregateResult`).
@@ -143,23 +143,23 @@ values ──JSONGenerator──▶ JSON (QueryResult shape) ──JSON.deserial
 
 - **One generic entry point.** No builder per type, no schema knowledge: whatever the deserializer accepts, `make` builds.
 - **Children in wire format.** A `List<SObject>` value is written as `{ totalSize, done, records }`, the only shape accepted for a child relationship.
-- **Order-compatible.** Fields are emitted in reverse insertion order, like `JSON.serialize(Map)`. Order-sensitive deserializers (`Database.SaveResult` lets a later `errors` reset `success`) behave as with the natural map order.
+- **Key order is handled.** `Database.*Result` deserializers let a later `errors` reset `success`. Fabricator emits keys in reverse, like `JSON.serialize(Map)`, so `success, id, errors` written in that order stays a success.
 
 ## Performance
 
-- One `JSONGenerator` pass, one `JSON.deserialize`. No serialize/deserialize round trip per child (3 children went from 315-385 µs to 70-80 µs).
+- One `JSONGenerator` pass, one `JSON.deserialize`. No serialize/deserialize round trip per child.
 - Key prefixes are described once per type (`SObjectDescribeOptions.DEFERRED`) and cached.
 
-CPU per call (Developer Edition, API 61, 200 iterations × 3 runs):
+CPU per call, API 67, Developer Edition, 500 iterations × 4 runs, loop overhead subtracted:
 
 | Scenario              | µs    |
 | --------------------- | ----- |
-| 4 writable fields     | 55-65 |
-| 1 read-only field     | 25-35 |
-| parent + grandparent  | 50-55 |
-| 3 child records       | 70-80 |
-| `Database.SaveResult` | 60-70 |
-| `nextId`              | ~5    |
+| 4 writable fields     | 56-72 |
+| 1 read-only field     | 30-36 |
+| parent + grandparent  | 52-60 |
+| 3 child records       | 66-78 |
+| `Database.SaveResult` | 38-46 |
+| `nextId`              | 10-16 |
 
 ## Gotchas
 
