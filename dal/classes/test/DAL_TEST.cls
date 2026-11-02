@@ -129,6 +129,12 @@ private class DAL_TEST {
     DAL.query('SELECT Id FROM Account', new Map<String, Object>(), AccessLevel.SYSTEM_MODE);
     Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class), AccessLevel.SYSTEM_MODE);
 
+    DAL.queryUserMode('SELECT Id FROM Account', new Map<String, Object>());
+    Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class), AccessLevel.USER_MODE);
+
+    DAL.querySystemMode('SELECT Id FROM Account', new Map<String, Object>());
+    Expect.that(querySpy).hasBeenCalledWith(Argument.ofType(String.class), Argument.ofType(Map<String, Object>.class), AccessLevel.SYSTEM_MODE);
+
     DAL.queryAggregate([SELECT Count(Id) countId FROM Account]);
     Expect.that(queryAggregateSpy).hasBeenCalledWith(Argument.ofType(List<AggregateResult>.class));
 
