@@ -48,8 +48,7 @@ Map<String, Object> bindVars = new Map<String, Object>{'name' => 'Test%'};
 List<Account> accounts = DAL.query('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars);
 
 // Explicitly select the access mode when needed
-List<Account> userModeAccounts = DAL.queryUserMode('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars);
-List<Account> systemModeAccounts = DAL.querySystemMode('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars);
+List<Account> systemModeAccounts = DAL.query('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars, AccessLevel.SYSTEM_MODE);
 
 // SOSL search
 List<List<SObject>> searchResults = DAL.find([FIND 'Test' IN ALL FIELDS RETURNING Account(Id, Name)]);
@@ -94,10 +93,9 @@ Execute operations with system privileges:
 DAL.insertRecords(records, AccessLevel.SYSTEM_MODE);
 DAL.updateRecords(records, AccessLevel.SYSTEM_MODE);
 DAL.query(soql, bindMap, AccessLevel.SYSTEM_MODE);
-DAL.querySystemMode(soql, bindMap);
 ```
 
-Dynamic SOQL defaults to `AccessLevel.USER_MODE`, enforcing the running user's sharing, CRUD, and FLS. Use `DAL.querySystemMode(soql, bindMap)` or pass `AccessLevel.SYSTEM_MODE` only when system privileges are intentional.
+Dynamic SOQL defaults to `AccessLevel.USER_MODE`, enforcing the running user's sharing, CRUD, and FLS. Pass `AccessLevel.SYSTEM_MODE` to the three-argument `DAL.query` overload only when system privileges are intentional.
 
 **DML Options**
 Customize DML operations with Database.DMLOptions:

@@ -196,12 +196,6 @@ public inherited sharing class DAL { // RepositoryService ACL
   public static List<SObject> query(final String soql, final Map<String, Object> bindMap) {
     return DAL.instance.query(soql, bindMap);
   }
-  public static List<SObject> queryUserMode(final String soql, final Map<String, Object> bindMap) {
-    return DAL.instance.query(soql, bindMap, AccessLevel.USER_MODE);
-  }
-  public static List<SObject> querySystemMode(final String soql, final Map<String, Object> bindMap) {
-    return DAL.instance.query(soql, bindMap, AccessLevel.SYSTEM_MODE);
-  }
   public static List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
     return DAL.instance.query(soql, bindMap, accessLevel);
   }
