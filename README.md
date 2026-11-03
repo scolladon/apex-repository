@@ -44,7 +44,11 @@ List<Account> accounts = DAL.query([SELECT Id, Name FROM Account WHERE Name LIKE
 
 // Dynamic query with bind variables
 Map<String, Object> bindVars = new Map<String, Object>{'name' => 'Test%'};
+// Dynamic SOQL defaults to USER_MODE (sharing, CRUD, and FLS enforced)
 List<Account> accounts = DAL.query('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars);
+
+// Explicitly select the access mode when needed
+List<Account> systemModeAccounts = DAL.query('SELECT Id, Name FROM Account WHERE Name LIKE :name', bindVars, AccessLevel.SYSTEM_MODE);
 
 // SOSL search
 List<List<SObject>> searchResults = DAL.find([FIND 'Test' IN ALL FIELDS RETURNING Account(Id, Name)]);
@@ -88,8 +92,10 @@ Execute operations with system privileges:
 ```apex
 DAL.insertRecords(records, AccessLevel.SYSTEM_MODE);
 DAL.updateRecords(records, AccessLevel.SYSTEM_MODE);
-DAL.queryRecords(soql, bindMap, AccessLevel.SYSTEM_MODE);
+DAL.query(soql, bindMap, AccessLevel.SYSTEM_MODE);
 ```
+
+Dynamic SOQL defaults to `AccessLevel.USER_MODE`, enforcing the running user's sharing, CRUD, and FLS. Pass `AccessLevel.SYSTEM_MODE` to the three-argument `DAL.query` overload only when system privileges are intentional.
 
 **DML Options**
 Customize DML operations with Database.DMLOptions:

@@ -340,7 +340,7 @@ public inherited sharing class DAL { // RepositoryService ACL
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap) {
-      return Database.queryWithBinds(soql, bindMap, AccessLevel.SYSTEM_MODE);
+      return Database.queryWithBinds(soql, bindMap, AccessLevel.USER_MODE);
     }
 
     public List<SObject> query(final String soql, final Map<String, Object> bindMap, AccessLevel accessLevel) {
